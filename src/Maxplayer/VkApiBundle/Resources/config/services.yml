@@ -1,0 +1,19 @@
+parameters:
+    vk_api_key: 4617137
+    vk_api_secret: "wjv0oh8UWSJVHpbSSqLG"
+    vk_api_scope:
+        - friends
+        - photos
+        - audio
+        - video
+        - docs
+        - status
+        - email
+        - notifications
+        - stats
+        - offline
+
+services:
+    maxplayer_vk_api.vk_transport:
+        class: Maxplayer\VkApiBundle\Service\VkTransport
+        arguments: [%vk_api_key%, %vk_api_secret%, %vk_api_scope%, @doctrine.orm.entity_manager]

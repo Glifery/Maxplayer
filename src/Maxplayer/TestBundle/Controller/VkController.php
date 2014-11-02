@@ -34,7 +34,6 @@ class VkController extends Controller
         $apiKey = $this->container->getParameter('vk_api_key');
         $apiSecret = $this->container->getParameter('vk_api_secret');
         $scope = 'friends,photos,audio,video,docs,status,email,notifications,stats,offline';
-        $scope = 'friends,photos,audio,video,docs,status,email,notifications,stats';
 
         $request = $this->get('request');
         $router = $this->get('router');

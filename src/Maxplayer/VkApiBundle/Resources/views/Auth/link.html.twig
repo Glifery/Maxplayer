@@ -1,0 +1,20 @@
+<h2>Приложение ID {{ apiKey }}:</h2>
+{% for flashMessage in app.session.flashbag.get('auth') %}
+    <div style="color: green">
+        {{ flashMessage }}
+    </div>
+{% endfor %}
+<p>Информация о токене:</p>
+{% if token is not null %}
+    <ul>
+        <li>{{ token.token }}</li>
+        <li>получен {{ token.createdAt|date('d.m.Y H:i:s') }}</li>
+        <li>время жизни {{ token.expired }}</li>
+    </ul>
+{% else %}
+    <ul>
+        <li>Токен отсутствует</li>
+    </ul>
+{% endif %}
+
+<a href="{{ authUrl }}">Получить токен</a>
