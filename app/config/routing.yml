@@ -1,0 +1,4 @@
+maxplayer_test:
+    resource: "@MaxplayerTestBundle/Resources/config/routing.yml"
+    prefix:   /
+

@@ -1,0 +1,8 @@
+parameters:
+    vk_api_key: 4617137
+    vk_api_secret: "wjv0oh8UWSJVHpbSSqLG"
+
+services:
+#    maxplayer_test.example:
+#        class: Maxplayer\TestBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]
