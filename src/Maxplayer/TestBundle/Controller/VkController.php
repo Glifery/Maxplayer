@@ -11,17 +11,17 @@ class VkController extends Controller
 {
     public function soundAction()
     {
-        $vk = $this->get('maxplayer_vk_api.vk_transport')->getInstance();
-        $vk
-            ->request('audio.search', array(
-                'q' => 'abba'
-            ))
-            ->each(function($qq, $ww) {
-                    $ss = 2;
-                })
-        ;
+        $vk = $this->get('maxplayer_vk_api.vk_transport');
+        if ($result = $vk->call('users.get', array(
+                'user_ids' => array(7991516,7991515),
+                'fields' => array('sex', 'city')
+            ))) {
+            $eee = $result;
+        } else {
+            $eee = $vk->getErrors();
+        }
 
-        return new Response();
+        return new Response('');
     }
 
     public function authAction()

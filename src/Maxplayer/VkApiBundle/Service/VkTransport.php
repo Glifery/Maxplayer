@@ -170,16 +170,33 @@ class VkTransport
     }
 
     /**
-     * @return Core|null
+     * @param string $methodName
+     * @param array $params
+     * @return array|null
      */
-    public function getInstance()
+    public function call($methodName, array $params = null)
     {
         if (!$this->token) {
-            $this->registerError('Trying to use Vk\Core for APP ID \''.$this->apiKey.'\' without token');
+            $this->registerError('Trying to use api for ID \''.$this->apiKey.'\' without token');
 
             return null;
         }
-        return $this->vkCore;
+
+        $result = array();
+        try {
+            $this->vkCore
+                ->request($methodName, $params)
+                ->each(function($index, $element) use (&$result) {
+                        $result[] = $element;
+                    })
+            ;
+        } catch (\Exception $e) {
+            $this->registerError('Error while calling \''.$methodName.'\' method: '.$e->getMessage());
+
+            return null;
+        }
+
+        return $result;
     }
 
     public function registerError($message)
