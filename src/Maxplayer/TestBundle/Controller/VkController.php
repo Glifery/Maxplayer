@@ -11,12 +11,7 @@ class VkController extends Controller
 {
     public function soundAction()
     {
-        $apiKey = $this->container->getParameter('vk_api_key');
-        $apiSecret = $this->container->getParameter('vk_api_secret');
-        $token = 'e80591131359b5ff931b13890f72de840f4a9f00058f729580c313a2d76af3495e494d5d55055b388b1db';
-
-        $vk = Core::getInstance()->apiVersion('5.26')->setToken($token);
-
+        $vk = $this->get('maxplayer_vk_api.vk_transport')->getInstance();
         $vk
             ->request('audio.search', array(
                 'q' => 'abba'

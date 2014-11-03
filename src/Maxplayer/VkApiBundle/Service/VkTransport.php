@@ -59,12 +59,7 @@ class VkTransport
     {
         $this->vkCore = Core::getInstance()->apiVersion(self::API_VERSION);
         if ($this->token) {
-            $authToken = new \getjump\Vk\Response\Auth();
-            $authToken->token = $this->token->getToken();
-            $authToken->expiresIn = $this->token->getExpired();
-            $authToken->userId = $this->token->getVkUserId();
-
-            $this->vkCore->setToken($authToken);
+            $this->vkCore->setToken($this->token->getToken());
         }
     }
 
@@ -151,5 +146,10 @@ class VkTransport
             $this->em->flush($token);
             $this->em->clear('Maxplayer\VkApiBundle\Entity\Token');
         }
+    }
+
+    public function getInstance()
+    {
+        return $this->vkCore;
     }
 }
