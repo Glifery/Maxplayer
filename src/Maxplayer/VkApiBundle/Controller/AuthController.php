@@ -17,11 +17,17 @@ class AuthController extends Controller
         $redirectUri = $request->getScheme() . '://' . $request->getHttpHost() . $router->generate('maxplayer_vk_api_auth_link');
 
         if ($code = $request->query->get('code')) {
-            $vkTransport->getNewTokenByCode($code, $redirectUri);
-            $this->get('session')->getFlashBag()->add(
-                'auth',
-                'Получен новый токен: '.$vkTransport->getToken()->getToken()
-            );
+            if ($vkTransport->getNewTokenByCode($code, $redirectUri)) {
+                $this->get('session')->getFlashBag()->add(
+                    'auth_success',
+                    'Получен новый токен: '.$vkTransport->getToken()->getToken()
+                );
+            } else {
+                $this->get('session')->getFlashBag()->add(
+                    'auth_error',
+                    $vkTransport->getErrors()
+                );
+            }
 
             return $this->redirect($this->generateUrl('maxplayer_vk_api_auth_link'));
         }

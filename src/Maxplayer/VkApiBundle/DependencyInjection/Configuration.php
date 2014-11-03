@@ -20,6 +20,17 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('maxplayer_vk_api');
 
+        $rootNode
+            ->children()
+                ->scalarNode('app_key')->cannotBeEmpty()->end()
+                ->scalarNode('app_secret')->cannotBeEmpty()->end()
+                ->arrayNode('app_scope')
+                    ->prototype('scalar')->end()
+                ->end()
+                ->scalarNode('auth_path')->defaultValue('auth')->end()
+            ->end()
+        ;
+
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.

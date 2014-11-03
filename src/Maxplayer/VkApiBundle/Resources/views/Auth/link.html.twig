@@ -1,5 +1,10 @@
 <h2>Приложение ID {{ apiKey }}:</h2>
-{% for flashMessage in app.session.flashbag.get('auth') %}
+{% for flashMessage in app.session.flashbag.get('auth_error') %}
+    <div style="color: red">
+        {{ flashMessage }}
+    </div>
+{% endfor %}
+{% for flashMessage in app.session.flashbag.get('auth_success') %}
     <div style="color: green">
         {{ flashMessage }}
     </div>

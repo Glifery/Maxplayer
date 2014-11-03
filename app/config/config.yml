@@ -70,3 +70,19 @@ swiftmailer:
     username:  "%mailer_user%"
     password:  "%mailer_password%"
     spool:     { type: memory }
+
+maxplayer_vk_api:
+    app_key: 4617137
+    app_secret: wjv0oh8UWSJVHpbSSqLG
+    app_scope:
+        - friends
+        - photos
+        - audio
+        - video
+        - docs
+        - status
+        - email
+        - notifications
+        - stats
+        - offline
+    auth_path: auth

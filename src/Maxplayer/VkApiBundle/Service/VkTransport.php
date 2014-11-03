@@ -5,7 +5,9 @@ namespace Maxplayer\VkApiBundle\Service;
 use Doctrine\ORM\EntityManager;
 use getjump\Vk\Auth;
 use getjump\Vk\Core;
+use GuzzleHttp\Exception\RequestException;
 use Maxplayer\VkApiBundle\Entity\Token;
+use Symfony\Bridge\Monolog\Logger;
 
 class VkTransport
 {
@@ -13,31 +15,35 @@ class VkTransport
 
     /** @var integer */
     private $apiKey;
-
     /** @var string */
     private $apiSecret;
-
     /** @var array */
     private $scope;
 
     /** @var  EntityManager */
     private $em;
+    /** @var Logger */
+    private $logger;
 
     /** @var Token */
     private $token;
 
     /** @var Auth */
     private $vkAuth;
-
     /** @var Core */
     private $vkCore;
 
-    public function __construct($apiKey, $apiSecret, $scope, EntityManager $em)
+    /** @var array */
+    private $errors;
+
+    public function __construct($apiKey, $apiSecret, $scope, EntityManager $em, Logger $logger)
     {
         $this->apiKey = $apiKey;
         $this->apiSecret = $apiSecret;
         $this->scope = $scope;
         $this->em = $em;
+        $this->logger = $logger;
+        $this->errors = array();
 
         $this->loadToken();
         $this->constructVkAuthObject();
@@ -125,31 +131,65 @@ class VkTransport
     /**
      * @param string $code
      * @param string $redirectUri
+     * @return bool
      */
     public function getNewTokenByCode($code, $redirectUri)
     {
         $this->vkAuth->setRedirectUri($redirectUri);
 
-        /** @var \getjump\Vk\Response\Auth $vkToken */
-        if ($vkToken = $this->vkAuth->getToken($code)) {
-            $this->vkCore->setToken($vkToken);
+        $vkToken = null;
+        try {
+            /** @var \getjump\Vk\Response\Auth $vkToken */
+            $vkToken = $this->vkAuth->getToken($code);
+        } catch (RequestException $e) {
+            $this->registerError('Getting new VK token error: '.$e->getMessage());
 
-            $token = new Token();
-            $token->setAppKey($this->apiKey);
-            $token->setToken($vkToken->token);
-            $token->setExpired($vkToken->expiresIn);
-            $token->setVkUserId($vkToken->userId);
-            $token->setCreatedAt(new \DateTime());
-
-            $this->token = $token;
-            $this->em->persist($token);
-            $this->em->flush($token);
-            $this->em->clear('Maxplayer\VkApiBundle\Entity\Token');
+            return false;
         }
+        if (!$vkToken) {
+            $this->registerError('New VK token is incorrect: \''.$vkToken.'\'');
+
+            return false;
+        }
+
+        $this->vkCore->setToken($vkToken);
+
+        $token = new Token();
+        $token->setAppKey($this->apiKey);
+        $token->setToken($vkToken->token);
+        $token->setExpired($vkToken->expiresIn);
+        $token->setVkUserId($vkToken->userId);
+        $token->setCreatedAt(new \DateTime());
+
+        $this->token = $token;
+        $this->em->persist($token);
+        $this->em->flush($token);
+        $this->em->clear('Maxplayer\VkApiBundle\Entity\Token');
+
+        return true;
     }
 
+    /**
+     * @return Core|null
+     */
     public function getInstance()
     {
+        if (!$this->token) {
+            $this->registerError('Trying to use Vk\Core for APP ID \''.$this->apiKey.'\' without token');
+
+            return null;
+        }
         return $this->vkCore;
+    }
+
+    public function registerError($message)
+    {
+        $this->errors[] = $message;
+        $this->logger->addError($message);
+    }
+
+    public function getErrors()
+    {
+        return implode(PHP_EOL, $this->errors);
     }
 }

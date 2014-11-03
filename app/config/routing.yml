@@ -1,6 +1,6 @@
 maxplayer_vk_api:
     resource: "@MaxplayerVkApiBundle/Resources/config/routing.yml"
-    prefix:   /vk/
+    prefix:   /vk
 
 maxplayer_test:
     resource: "@MaxplayerTestBundle/Resources/config/routing.yml"
