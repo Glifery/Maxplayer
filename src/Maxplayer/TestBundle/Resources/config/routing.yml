@@ -7,3 +7,6 @@ maxplayer_test_vk_auth:
 maxplayer_test_vk_sound:
     path:     /test/vk/sound
     defaults: { _controller: MaxplayerTestBundle:Vk:sound }
+maxplayer_test_vk_request:
+    path:     /test/vk/request
+    defaults: { _controller: MaxplayerTestBundle:Vk:request }

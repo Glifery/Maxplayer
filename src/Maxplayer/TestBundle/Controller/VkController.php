@@ -4,13 +4,37 @@ namespace Maxplayer\TestBundle\Controller;
 
 use getjump\Vk\Core;
 use getjump\Vk\Auth;
+use Maxplayer\VkApiBundle\Service\VkTransport;
+use Maxplayer\VkRequestBundle\Model\ApiRequest;
+use Maxplayer\VkRequestBundle\Service\VkGate;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
 class VkController extends Controller
 {
+    public function requestAction()
+    {
+        /** @var VkGate $vk */
+        $vk = $this->get('maxplayer_vk_request.vk_gate');
+
+        $apiRequest = new ApiRequest();
+        $apiRequest
+            ->setMethod('users.get')
+            ->addParam('user_ids', array(7991516, 7991517))
+            ->addParam('fields', array('sex', 'city'))
+        ;
+
+        $apiResponce = $vk->call($apiRequest);
+        foreach ($apiResponce->getData() as $item) {
+            $item = $item;
+        }
+
+        return new Response('requestAction');
+    }
+
     public function soundAction()
     {
+        /** @var VkTransport $vk */
         $vk = $this->get('maxplayer_vk_api.vk_transport');
         if ($result = $vk->call('users.get', array(
                 'user_ids' => array(7991516,7991515),
@@ -18,7 +42,7 @@ class VkController extends Controller
             ))) {
             $eee = $result;
         } else {
-            $eee = $vk->getErrors();
+            $eee = $vk->getLastError();
         }
 
         return new Response('');

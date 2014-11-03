@@ -1,0 +1,4 @@
+services:
+    maxplayer_vk_request.vk_gate:
+        class: Maxplayer\VkRequestBundle\Service\VkGate
+        arguments: [@maxplayer_vk_api.vk_transport]

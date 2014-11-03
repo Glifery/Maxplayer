@@ -1,3 +1,7 @@
+maxplayer_vk_request:
+    resource: "@MaxplayerVkRequestBundle/Resources/config/routing.yml"
+    prefix:   /
+
 maxplayer_vk_api:
     resource: "@MaxplayerVkApiBundle/Resources/config/routing.yml"
     prefix:   /vk

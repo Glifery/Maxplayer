@@ -18,6 +18,7 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new Maxplayer\TestBundle\MaxplayerTestBundle(),
             new Maxplayer\VkApiBundle\MaxplayerVkApiBundle(),
+            new Maxplayer\VkRequestBundle\MaxplayerVkRequestBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
