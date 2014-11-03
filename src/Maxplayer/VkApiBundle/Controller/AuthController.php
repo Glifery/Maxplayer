@@ -25,7 +25,7 @@ class AuthController extends Controller
             } else {
                 $this->get('session')->getFlashBag()->add(
                     'auth_error',
-                    $vkTransport->getErrors()
+                    $vkTransport->getLastError()
                 );
             }
 

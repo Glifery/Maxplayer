@@ -205,8 +205,8 @@ class VkTransport
         $this->logger->addError($message);
     }
 
-    public function getErrors()
+    public function getLastError()
     {
-        return implode(PHP_EOL, $this->errors);
+        return end($this->errors);
     }
 }
