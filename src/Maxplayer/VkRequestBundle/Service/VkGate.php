@@ -4,7 +4,8 @@ namespace Maxplayer\VkRequestBundle\Service;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Maxplayer\VkApiBundle\Service\VkTransport;
-use Maxplayer\VkRequestBundle\Model\ApiRequest;
+use Maxplayer\VkRequestBundle\Exception\TransformException;
+use Maxplayer\VkRequestBundle\Model\ApiRequestInterface;
 use Maxplayer\VkRequestBundle\Model\ApiResponce;
 
 class VkGate
@@ -12,19 +13,24 @@ class VkGate
     /** @var VkTransport */
     private $vkTransport;
 
+    /** @var TransformManager */
+    private $transformManager;
+
     /**
      * @param VkTransport $vkTransport
+     * @param TransformManager $transformManager
      */
-    public function __construct(VkTransport $vkTransport)
+    public function __construct(VkTransport $vkTransport, TransformManager $transformManager = null)
     {
         $this->vkTransport = $vkTransport;
+        $this->transformManager = $transformManager;
     }
 
     /**
-     * @param ApiRequest $apiRequest
+     * @param ApiRequestInterface $apiRequest
      * @return ApiResponce
      */
-    public function call(ApiRequest $apiRequest)
+    public function call(ApiRequestInterface $apiRequest)
     {
         $apiResponce = $this->createApiResponce($apiRequest);
         $this->validateApiRequest($apiRequest, $apiResponce);
@@ -47,10 +53,10 @@ class VkGate
     }
 
     /**
-     * @param ApiRequest $apiRequest
+     * @param ApiRequestInterface $apiRequest
      * @return ApiResponce
      */
-    private function createApiResponce(ApiRequest $apiRequest)
+    private function createApiResponce(ApiRequestInterface $apiRequest)
     {
         $data = new ArrayCollection();
         $apiResponce = new ApiResponce($apiRequest, new \DateTime, $data);
@@ -59,10 +65,10 @@ class VkGate
     }
 
     /**
-     * @param ApiRequest $apiRequest
+     * @param ApiRequestInterface $apiRequest
      * @param ApiResponce $apiResponce
      */
-    private function validateApiRequest(ApiRequest $apiRequest, ApiResponce $apiResponce)
+    private function validateApiRequest(ApiRequestInterface $apiRequest, ApiResponce $apiResponce)
     {
         if (!$apiRequest->getMethod()) {
             $this->registerError('Empty VK api request method', $apiResponce);
@@ -88,7 +94,17 @@ class VkGate
         /** @var ArrayCollection $data */
         $data = $apiResponce->getData();
 
-        foreach ($result as $item) {
+        foreach ($result as $index => $item) {
+            if ($this->transformManager) {
+                try {
+                    $item = $this->transformManager->transformResponceData($apiResponce, $item);
+                } catch (TransformException $e) {
+                    $apiResponce->addError('Transforming '.$index.' item error: '.$e->getMessage());
+
+                    continue;
+                }
+            }
+
             $data->add($item);
         }
     }

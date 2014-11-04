@@ -25,8 +25,11 @@ class VkController extends Controller
         ;
 
         $apiResponce = $vk->call($apiRequest);
-        foreach ($apiResponce->getData() as $item) {
-            $item = $item;
+
+        if ($apiResponce->isSuccess()) {
+            foreach ($apiResponce->getData() as $item) {
+                $item = $item;
+            }
         }
 
         return new Response('requestAction');

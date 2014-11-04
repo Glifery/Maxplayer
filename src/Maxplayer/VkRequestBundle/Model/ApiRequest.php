@@ -2,7 +2,7 @@
 
 namespace Maxplayer\VkRequestBundle\Model;
 
-class ApiRequest
+class ApiRequest implements ApiRequestInterface
 {
     /** @var string */
     private $method;
