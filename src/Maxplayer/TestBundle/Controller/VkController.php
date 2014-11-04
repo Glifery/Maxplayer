@@ -19,9 +19,10 @@ class VkController extends Controller
 
         $apiRequest = new ApiRequest();
         $apiRequest
-            ->setMethod('users.get')
-            ->addParam('user_ids', array(7991516, 7991517))
-            ->addParam('fields', array('sex', 'city'))
+//            ->setMethod('users.get')
+            ->setMethod('audio.search')
+//            ->addParam('user_ids', array(7991516, 7991517))
+//            ->addParam('fields', array('sex', 'city'))
         ;
 
         $apiResponce = $vk->call($apiRequest);
