@@ -10,3 +10,6 @@ maxplayer_test_vk_sound:
 maxplayer_test_vk_request:
     path:     /test/vk/request
     defaults: { _controller: MaxplayerTestBundle:Vk:request }
+maxplayer_test_rest_track:
+    path:     /test/rest/track
+    defaults: { _controller: MaxplayerTestBundle:Rest:track }

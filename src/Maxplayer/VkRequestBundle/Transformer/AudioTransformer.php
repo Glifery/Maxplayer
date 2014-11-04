@@ -2,20 +2,22 @@
 
 namespace Maxplayer\VkRequestBundle\Transformer;
 
-use Maxplayer\VkRequestBundle\Exception\TransformException;
 use \Maxplayer\VkRequestBundle\Model\ResponceData\Audio;
 
-class AudioTransformer implements TransformerInterface
+class AudioTransformer extends AutomaticTransformer implements TransformerInterface
 {
     public function transform(\stdClass $item)
     {
         $audio = new Audio();
-        $audio->setId($item->id);
-        $audio->setArtist($item->artist);
-        $audio->setTrack($item->title);
-        $audio->setDuration($item->duration);
-        $audio->setUrl($item->url);
-        $audio->setLyrics($item->lyrics_id);
+        $this->transformWithMap($audio, array(
+                'id' => 'id',
+                'artist' => 'artist',
+                'track' => 'title',
+                'duration' => 'duration',
+                'url' => 'url',
+                'lyrics' => 'lyrics_id',
+                'genre' => 'genre_id'
+            ), $item);
 
         return $audio;
     }

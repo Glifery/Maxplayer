@@ -1,0 +1,4 @@
+services:
+#    maxplayer_rest.example:
+#        class: Maxplayer\RestBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]

@@ -22,6 +22,9 @@ class Audio
     /** @var integer */
     private $lyrics;
 
+    /** @var integer */
+    private $genre;
+
     /**
      * @param string $artist
      */
@@ -116,5 +119,21 @@ class Audio
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * @param int $genre
+     */
+    public function setGenre($genre)
+    {
+        $this->genre = $genre;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGenre()
+    {
+        return $this->genre;
     }
 }

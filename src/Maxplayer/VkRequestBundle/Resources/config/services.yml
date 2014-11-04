@@ -6,3 +6,6 @@ services:
         class: Maxplayer\VkRequestBundle\Service\TransformManager
         calls:
             - [ registerTransformer, [audio.search, Maxplayer\VkRequestBundle\Transformer\AudioTransformer]]
+    maxplayer_vk_request.vk_repository:
+        class: Maxplayer\VkRequestBundle\Service\VkRepository
+        arguments: [@maxplayer_vk_request.vk_gate]
