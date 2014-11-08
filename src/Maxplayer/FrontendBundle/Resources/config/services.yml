@@ -1,0 +1,4 @@
+services:
+#    maxplayer_frontend.example:
+#        class: Maxplayer\FrontendBundle\Example
+#        arguments: [@service_id, "plain_value", %parameter%]

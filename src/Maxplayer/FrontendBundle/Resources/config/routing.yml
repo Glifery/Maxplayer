@@ -1,0 +1,3 @@
+maxplayer_frontend_homepage:
+    path:     /
+    defaults: { _controller: MaxplayerFrontendBundle:Default:index }

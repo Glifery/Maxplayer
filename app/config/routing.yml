@@ -1,3 +1,7 @@
+maxplayer_frontend:
+    resource: "@MaxplayerFrontendBundle/Resources/config/routing.yml"
+    prefix:   /
+
 maxplayer_rest:
     resource: "@MaxplayerRestBundle/Resources/config/routing.yml"
     prefix:   /

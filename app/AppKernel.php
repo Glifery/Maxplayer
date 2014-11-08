@@ -20,6 +20,7 @@ class AppKernel extends Kernel
             new Maxplayer\VkApiBundle\MaxplayerVkApiBundle(),
             new Maxplayer\VkRequestBundle\MaxplayerVkRequestBundle(),
             new Maxplayer\RestBundle\MaxplayerRestBundle(),
+            new Maxplayer\FrontendBundle\MaxplayerFrontendBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
