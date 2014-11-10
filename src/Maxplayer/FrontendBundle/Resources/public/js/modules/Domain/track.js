@@ -3,20 +3,26 @@ define([
     'Utils/Debug',
     'backbone'
 ], function (
-    checkType,
-    debug,
+    CheckType,
+    Debug,
     Backbone
 ) {
     var Track = Backbone.Model.extend({
         defaults: {
             name: null,
             artist: null,
-            url: null,
-            image: null,
-            streamable: null,
-            listeners: null
-        },
-        initialize: function(){
+            duration: null,
+            listeners: null,
+
+            smallImage: null,
+            mediumImage: null,
+            fullImage: null,
+
+            similarTracks: null,
+            genres: null,
+            artist: null,
+            album: null,
+            sound: null
         }
     });
 

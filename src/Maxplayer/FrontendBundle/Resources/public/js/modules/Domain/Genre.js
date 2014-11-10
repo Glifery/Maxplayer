@@ -7,7 +7,7 @@ define([
     Debug,
     Backbone
 ) {
-    var Artist = Backbone.Model.extend({
+    var Genre = Backbone.Model.extend({
         defaults: {
             name: null,
             mbid: null,
@@ -17,12 +17,12 @@ define([
             mediumImage: null,
             fullImage: null,
 
-            similarArtists: null,
-            genres: null,
-            albums: null,
+            similarGenres: null,
+            topArtists: null,
+            topAlbums: null,
             topTracks: null
         }
     });
 
-    return Artist;
+    return Genre;
 });

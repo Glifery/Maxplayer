@@ -7,22 +7,23 @@ define([
     Debug,
     Backbone
 ) {
-    var Artist = Backbone.Model.extend({
+    var Album = Backbone.Model.extend({
         defaults: {
             name: null,
             mbid: null,
+            year: null,
             listeners: null,
 
             smallImage: null,
             mediumImage: null,
             fullImage: null,
 
-            similarArtists: null,
+            similarAlbums: null,
             genres: null,
-            albums: null,
-            topTracks: null
+            artist: null,
+            tracks: null
         }
     });
 
-    return Artist;
+    return Album;
 });
