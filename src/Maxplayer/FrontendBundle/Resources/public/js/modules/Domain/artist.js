@@ -1,13 +1,17 @@
 define([
     'Utils/CheckType',
     'Utils/Debug',
-    'backbone'
+    'backbone',
+    'Domain/Domain'
 ], function (
     CheckType,
     Debug,
-    Backbone
+    Backbone,
+    Domain
 ) {
-    var Artist = Backbone.Model.extend({
+    var domain = 'artist';
+
+    var Artist = Domain.extend({
         defaults: {
             name: null,
             mbid: null,
@@ -15,13 +19,15 @@ define([
 
             smallImage: null,
             mediumImage: null,
-            fullImage: null,
-
-            similarArtists: null,
-            genres: null,
-            albums: null,
-            topTracks: null
-        }
+            fullImage: null
+        },
+        domain: domain,
+        relations: [
+            'similarArtists',
+            'genres',
+            'albums',
+            'topTracks'
+        ]
     });
 
     return Artist;
