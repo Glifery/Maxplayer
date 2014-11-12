@@ -2,5 +2,5 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script data-main="{{ asset('bundles/maxplayerfrontend/js/config.js') }}" src="{{ asset('bundles/maxplayerfrontend/js/vendor/require.js') }}"></script>
-{% endblock %}
+    <script data-main="{% block requirejs_main %}{{ path('maxplayer_frontend_requirejs_main') }}{% endblock requirejs_main %}" src="{{ asset('bundles/maxplayerfrontend/js/vendor/require.js') }}"></script>
+{% endblock javascripts %}

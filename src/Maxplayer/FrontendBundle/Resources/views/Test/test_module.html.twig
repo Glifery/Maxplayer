@@ -1,0 +1,3 @@
+{% extends 'MaxplayerFrontendBundle::frontend_layout.html.twig' %}
+
+{% block requirejs_main %}{{ path('maxplayer_frontend_requirejs_main_test_module', {'module': modulePath}) }}{% endblock requirejs_main %}
