@@ -5,28 +5,33 @@ define([
     CheckType,
     ThenLink
     ) {
-    var ThenChain = thenChainConstructor;
-    ThenChain.prototype.push = push;
-    ThenChain.prototype.getOnResolveFn = getOnResolveFn;
-    ThenChain.prototype.getOnRejectFn = getOnRejectFn;
-    ThenChain.prototype.createLink = createLink;
+    var ThenChainClass = ThenChain;
+    ThenChainClass.prototype.push = push;
+    ThenChainClass.prototype.getOnResolveFn = getOnResolveFn;
+    ThenChainClass.prototype.getOnRejectFn = getOnRejectFn;
+    ThenChainClass.prototype.createLink = createLink;
+    ThenChainClass.prototype.getClosestLink = getClosestLink;
 
-    function thenChainConstructor() {
+    function ThenChain() {
         this.nextLink = null;
     }
 
     function createLink(onResolveFn, onRejectFn) {
         if (typeof onResolveFn !== 'function') {
-            throw new Error('unexpected type of \'onResolveFn\' function: '+typeof onResolveFn);
+            throw new TypeError(typeof onResolveFn + ' is not a onResolveFn function');
         }
         if ((typeof onRejectFn !== 'undefined') && (typeof onRejectFn !== 'function')) {
-            throw new Error('unexpected type of \'onRejectFn\' function: '+typeof onRejectFn);
+            throw new TypeError(typeof onRejectFn + ' is not a onRejectFn function');
         }
 
         return new ThenLink(onResolveFn, onRejectFn);
     }
 
     function push(thenLink) {
+        if (!(thenLink instanceof ThenLink)) {
+            throw new TypeError(typeof thenLink + ' is not a ThenLink object');
+        }
+
         if (this.nextLink === null) {
             this.nextLink = thenLink;
 
@@ -51,8 +56,19 @@ define([
             return null;
         }
 
-        return thenChain.nextLink.getOnEndFn(onEndFnName);
+        var linkWithOnEndFn = thenChain.nextLink.getLinkWithOnEndFn(onEndFnName);
+        if (linkWithOnEndFn instanceof ThenLink) {
+            thenChain.nextLink = linkWithOnEndFn.nextLink;
+
+            return linkWithOnEndFn[onEndFnName];
+        }
+
+        return null;
     }
 
-    return ThenChain;
+    function getClosestLink() {
+        return this.nextLink;
+    }
+
+    return ThenChainClass;
 });

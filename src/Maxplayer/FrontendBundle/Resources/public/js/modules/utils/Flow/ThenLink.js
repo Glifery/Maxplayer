@@ -5,7 +5,7 @@ define([
     ) {
     var ThenLinkClass = ThenLink;
     ThenLinkClass.prototype.push = push;
-    ThenLinkClass.prototype.getOnEndFn = getOnEndFn;
+    ThenLinkClass.prototype.getLinkWithOnEndFn = getLinkWithOnEndFn;
 
     function ThenLink(onResolveFn, onRejectFn) {
         this.onResolveFn = onResolveFn;
@@ -25,16 +25,16 @@ define([
         return this;
     }
 
-    function getOnEndFn(onEndFnName) {
+    function getLinkWithOnEndFn(onEndFnName) {
         if (typeof this[onEndFnName] === 'function') {
-            return this[onEndFnName];
+            return this;
         }
 
         if (this.nextLink === null) {
             return null;
         }
 
-        return this.nextLink.getOnEndFn(onEndFnName);
+        return this.nextLink.getLinkWithOnEndFn(onEndFnName);
     }
 
     return ThenLinkClass;

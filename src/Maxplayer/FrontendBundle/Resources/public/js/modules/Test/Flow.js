@@ -3,17 +3,23 @@ define([
 ], function (
     Flow
     ) {
-    var promise = new Flow.promise(function(pr) {
-        pr.reject('rejectedData');
+    var promise = new Flow.promise(function(resolve, reject) {
+        resolve('rejectedData');
 
-        setInterval(function() {
-            pr.resolve('resolvedData');
-        }, 1000);
+//        setInterval(function() {
+//            resolve('resolvedData');
+//        }, 1000);
     });
     console.log('init promise', promise);
     promise
         .then(function(result) {
-                console.log('resolve1', result);
+//                console.log('resolve1', result);
+
+                return 42;
+
+//                return new Flow.promise(function(resolve, reject) {
+//                    resolve('resolved_inner');
+//                });
             }
 //            ,
 //            function(result) {
@@ -22,8 +28,24 @@ define([
         )
         .then(function(result) {
                 console.log('resolve2', result);
-            }, function(result) {
+
+//                return 56;
+                return new Flow.promise(function(resolve, reject) {
+                        console.log('from inner Promise');
+
+                        reject('from inner Promise');
+                    }).then(function(result) {
+                            console.log('new Then', result);
+                    });
+            }
+            , function(result) {
                 console.log('reject2', result);
+            }
+        )
+        .then(function(result) {
+                console.log('resolve3', result);
+            }, function(result) {
+                console.log('reject3', result);
             }
         )
         .fire();

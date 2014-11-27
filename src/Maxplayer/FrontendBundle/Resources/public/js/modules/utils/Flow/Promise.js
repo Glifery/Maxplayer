@@ -15,9 +15,8 @@ define([
     var PromiseClass = Promise;
 
     function Promise(bodyFn) {
-        var _bodyFn = bodyFn,
-            _resolvedResults = null,
-            _rejectedResults = null,
+        var _this = this,
+            _bodyFn = bodyFn,
             _status = 0,//0 - not fired, 1 - firing, 2 - resolved, 3 - rejected
             _thenChain = new ThenChain;
         ;
@@ -28,62 +27,70 @@ define([
 
         //TODO: move out functions from object to prototype (difficult)
         function _resolve() {
-            _validateOnEndStatus(2);
-
             _status = 2;
-            _resolvedResults = arguments;
 
-            _callOnEndFunction();
+            _callOnEndFunction.apply(_this, arguments);
         }
 
         function _reject() {
-            _validateOnEndStatus(3);
-
             _status = 3;
-            _rejectedResults = arguments;
 
-            _callOnEndFunction();
+            _callOnEndFunction.apply(_this, arguments);
         }
-
-        var promiseInnerInterface = {
-            resolve: _resolve,
-            reject: _reject
-        };
 
         function _then() {
             var thenLink = _thenChain.createLink.apply(_thenChain, arguments);
 
             _thenChain.push(thenLink);
 
-            return promiseOuterInterface;
+            return _this;
         }
 
         function _callOnEndFunction() {
-            var onEndFn = null;
-
             switch (_status) {
                 case 2:
-                    onEndFn = _thenChain.getOnResolveFn();
-                    if (typeof onEndFn === 'function') {
-                        onEndFn.apply(promiseOuterInterface, _resolvedResults);
-                    }
+                    var onEndFn = _thenChain.getOnResolveFn();
                     break;
                 case 3:
-                    onEndFn = _thenChain.getOnRejectFn();
-                    if (typeof onEndFn === 'function') {
-                        onEndFn.apply(promiseOuterInterface, _rejectedResults);
-                    }
+                    var onEndFn = _thenChain.getOnRejectFn();
                     break;
+                default:
+                    throw new Error('unexpected Promise status: ' + _status + 'when calling onEnd function');
+            }
+
+            _recursiveCallOnEndFu(onEndFn, arguments);
+        }
+
+        function _recursiveCallOnEndFu(onEndFn, arguments) {
+            if (typeof onEndFn === 'function') {
+                var onEndFnResult = onEndFn.apply(_this, arguments);
+
+                if (typeof onEndFnResult === 'undefined') {
+                    return;
+                }
+
+                //TODO: change to:
+                if (onEndFnResult instanceof Promise) {
+                    var closestLink = _thenChain.getClosestLink();
+                    onEndFnResult.getThenChain().push(closestLink);
+                    onEndFnResult.fire();
+                } else {
+                    console.log('TODO! with', onEndFnResult);
+                    var nextOnEndFn = _thenChain.getOnResolveFn();
+
+                    _recursiveCallOnEndFu(nextOnEndFn, [onEndFnResult]);
+                }
             }
         }
 
         function _fireBodyFn() {
             if (_status === 0) {
                 _status = 1;
-                bodyFn(promiseInnerInterface);
+
+                bodyFn.call(_this, _resolve, _reject);
             }
 
-            return promiseOuterInterface;
+            return _this;
         }
 
         function _validateOnEndStatus(onEndEventStatus) {
@@ -92,12 +99,11 @@ define([
             }
         }
 
-        var promiseOuterInterface = {
-            then: _then,
-            fire: _fireBodyFn
+        this.then = _then;
+        this.fire = _fireBodyFn;
+        this.getThenChain = function() {
+            return _thenChain;
         }
-
-        return promiseOuterInterface;
     };
 
     return PromiseClass;
