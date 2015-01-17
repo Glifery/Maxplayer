@@ -69,13 +69,11 @@ define([
                     return;
                 }
 
-                //TODO: change to:
                 if (onEndFnResult instanceof Promise) {
                     var closestLink = _thenChain.getClosestLink();
                     onEndFnResult.getThenChain().push(closestLink);
                     onEndFnResult.fire();
                 } else {
-                    console.log('TODO! with', onEndFnResult);
                     var nextOnEndFn = _thenChain.getOnResolveFn();
 
                     _recursiveCallOnEndFu(nextOnEndFn, [onEndFnResult]);
@@ -93,6 +91,10 @@ define([
             return _this;
         }
 
+        function _getThenChain() {
+            return _thenChain;
+        }
+
         function _validateOnEndStatus(onEndEventStatus) {
             if (_status !== 1) {
                 throw new Error('calling Promise event \''+promiseStatuses[onEndEventStatus]+'\' on Promise with status \''+promiseStatuses[_status]+'\'');
@@ -101,9 +103,7 @@ define([
 
         this.then = _then;
         this.fire = _fireBodyFn;
-        this.getThenChain = function() {
-            return _thenChain;
-        }
+        this.getThenChain = _getThenChain;
     };
 
     return PromiseClass;
