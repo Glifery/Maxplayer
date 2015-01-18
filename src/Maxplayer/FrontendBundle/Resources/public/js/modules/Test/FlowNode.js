@@ -9,31 +9,40 @@ define([
     var promises = {
         p1: function(input) {return generatePromise(1, true, input).then(function(result) {console.log('....1 then ' + result); return result;})},
         p2: function(input) {return generatePromise(2, true, input).then(function(result) {console.log('....2 then ' + result); return result;})},
-        p3: function(input) {return generatePromise(3, true, input).then(function(result) {console.log('....3 then ' + result); return result;})}
+        p3: function(input) {return generatePromise(3, true, input).then(function(result) {console.log('....3 then ' + result); return result;})},
+        p4: function(input) {return generatePromise(3, true, input).then(function(result) {console.log('....4 then ' + result); return result;})}
     }
-    var track = new Flow.track;
+    var promise = new Flow.track;
 
     setTimeout(function() {
         console.log('BREAKED!-------');
-        track.break();
-    }, 900);
+        promise.break();
+    }, 2900);
 
-    track.promise
-//        .then(promises.p1)
-//        .then(promises.p2)
-//        .then(promises.p3)
-//        .then(promises.p1)
-//        .then(promises.p2)
-//        .then(promises.p3)
+    promise
+        .then(function(result) {console.log(123); return 123})
+        .then(promises.p1, function(result) {console.log('REJECT1: ' + result)})
+        .then(promises.p2, function(result) {console.log('REJECT2: ' + result)})
+        .then(promises.p3, function(result) {console.log('REJECT3: ' + result)})
+        .then(promises.p4, function(result) {console.log('REJECT4: ' + result)})
 
-        .then(track.check(promises.p1))
-        .then(track.check(promises.p2))
-        .then(track.check(promises.p3))
-        .then(track.check(promises.p3))
-        .then(
-            function(result) {console.log('RESULT: ' + result)},
-            function(result) {console.log('REJECT: ' + result)}
-        )
+//        .then(track.check(promises.p1))
+//        .then(track.check(promises.p2))
+//        .then(track.check(promises.p3))
+//        .then(track.check(promises.p3))
+//        .then(
+//            function(result) {console.log('RESULT: ' + result)},
+//            function(result) {console.log('REJECT: ' + result)}
+//        )
+
+//    www = www.then(track.check(promises.p1));
+//    www = www.then(track.check(promises.p2));
+//    www = www.then(track.check(promises.p3));
+//    www = www.then(track.check(promises.p3));
+//    www = www.then(
+//        function(result) {console.log('RESULT: ' + result)},
+//        function(result) {console.log('REJECT: ' + result)}
+//    );
 
 //      .then(function(result) {
 //            if (!breaked) {
@@ -70,7 +79,7 @@ define([
                     console.log('....' + index + ') rejected');
                     reject(input + ' rj' + index);
                 }
-            }, 500);
+            }, 1000);
         });
     }
 });
