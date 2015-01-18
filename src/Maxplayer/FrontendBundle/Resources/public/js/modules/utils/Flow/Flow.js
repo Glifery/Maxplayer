@@ -1,12 +1,15 @@
 define([
     'Utils/CheckType',
-    'Utils/Flow/Promise'
+    'Utils/Flow/Promise/Promise',
+    'Utils/Flow/Track'
 ], function (
     CheckType,
-    Promise
+    Promise,
+    Track
     ) {
     var module = {
-        promise: Promise
+        promise: Promise,
+        track: Track
     };
 
     return module;

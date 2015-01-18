@@ -1,6 +1,6 @@
 define([
     'Utils/CheckType',
-    'Utils/Flow/ThenChain'
+    'Utils/Flow/Promise/ThenChain'
 ], function (
     CheckType,
     ThenChain
