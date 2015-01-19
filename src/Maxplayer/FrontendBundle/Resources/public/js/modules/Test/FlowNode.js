@@ -1,9 +1,9 @@
 //http://maxplayer.my/app_dev.php/test/module/Test-FlowNode
 
 define([
-    'Utils/Flow/Flow'
+    'Utils/Flow/Promise'
 ], function (
-    Flow
+    FlowPromise
     ) {
 
     var promises = {
@@ -12,7 +12,7 @@ define([
         p3: function(input) {return generatePromise(3, true, input).then(function(result) {console.log('....3 then ' + result); return result;})},
         p4: function(input) {return generatePromise(3, true, input).then(function(result) {console.log('....4 then ' + result); return result;})}
     }
-    var promise = new Flow.track;
+    var promise = new FlowPromise;
 
     setTimeout(function() {
         console.log('BREAKED!-------');

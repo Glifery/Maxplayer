@@ -1,6 +1,6 @@
 define([
     'Utils/CheckType',
-    'Utils/Flow/Promise/ThenLink'
+    'Utils/Flow/CustomPromise/ThenLink'
 ], function (
     CheckType,
     ThenLink

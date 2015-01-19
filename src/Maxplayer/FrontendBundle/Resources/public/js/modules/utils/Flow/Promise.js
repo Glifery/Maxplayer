@@ -3,13 +3,13 @@ define([
 ], function (
     CheckType
     ) {
-    var TrackClass = Track;
+    var FlowPromiseClass = FlowPromise;
 
-    TrackClass.prototype.break = _break;
-    TrackClass.prototype.check = _check;
-    TrackClass.prototype.then = _then;
+    FlowPromiseClass.prototype.break = _break;
+    FlowPromiseClass.prototype.check = _check;
+    FlowPromiseClass.prototype.then = _then;
 
-    function Track(node) {
+    function FlowPromise(node) {
         this._breaked = false;
         this._promise = Promise.resolve();
         this._iterator = null;
@@ -37,5 +37,5 @@ define([
         return this;
     }
 
-    return TrackClass;
+    return FlowPromise;
 });
