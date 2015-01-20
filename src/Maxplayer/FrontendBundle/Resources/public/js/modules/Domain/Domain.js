@@ -10,7 +10,7 @@ define([
 
     var Domain = Backbone.Model.extend({
         initialize: function() {
-            setPromisesToDomainAttributes(this);
+//            setPromisesToDomainAttributes(this);
         }
     });
 

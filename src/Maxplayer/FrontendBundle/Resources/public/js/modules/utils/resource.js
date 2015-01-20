@@ -79,17 +79,17 @@ define([
         return url;
     }
 
-    var resourceConstructor = function(opts) {
+    var Resource = function(opts) {
         this.opts = $.extend(true, defaultOpts, opts);
     }
 
-    resourceConstructor.prototype.addRoute = addRoute;
+    Resource.prototype.addRoute = addRoute;
 
     /**
      *
      * @param string name
      * @param object routeOpts
-     * @returns resourceConstructor
+     * @returns Resource
      */
     function addRoute(name, routeOpts) {
         var routeFunction = createRouteFunction(routeOpts, this.opts);
@@ -155,7 +155,7 @@ define([
 
     return {
         create: function(opts) {
-            return new resourceConstructor(opts);
+            return new Resource(opts);
         }
     }
 });

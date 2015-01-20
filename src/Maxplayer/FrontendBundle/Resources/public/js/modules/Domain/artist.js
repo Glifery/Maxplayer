@@ -15,19 +15,21 @@ define([
         defaults: {
             name: null,
             mbid: null,
-            listeners: null,
+            images: null
 
-            smallImage: null,
-            mediumImage: null,
-            fullImage: null
+//            listeners: null,
+//
+//            smallImage: null,
+//            mediumImage: null,
+//            fullImage: null
         },
-        domain: domain,
-        relations: [
-            'similarArtists',
-            'genres',
-            'albums',
-            'topTracks'
-        ]
+        domain: domain
+//        relations: [
+//            'similarArtists',
+//            'genres',
+//            'albums',
+//            'topTracks'
+//        ]
     });
 
     return Artist;
