@@ -1,22 +1,22 @@
 define([
     'Utils/CheckType',
-    'Utils/Flow/ThenLink'
+    'Utils/Flow/CustomPromise/ThenLink'
 ], function (
     CheckType,
     ThenLink
     ) {
     var ThenChainClass = ThenChain;
-    ThenChainClass.prototype.push = push;
-    ThenChainClass.prototype.getOnResolveFn = getOnResolveFn;
-    ThenChainClass.prototype.getOnRejectFn = getOnRejectFn;
-    ThenChainClass.prototype.createLink = createLink;
-    ThenChainClass.prototype.getClosestLink = getClosestLink;
+    ThenChainClass.prototype.push = _push;
+    ThenChainClass.prototype.getOnResolveFn = _getOnResolveFn;
+    ThenChainClass.prototype.getOnRejectFn = _getOnRejectFn;
+    ThenChainClass.prototype.createLink = _createLink;
+    ThenChainClass.prototype.getClosestLink = _getClosestLink;
 
     function ThenChain() {
         this.nextLink = null;
     }
 
-    function createLink(onResolveFn, onRejectFn) {
+    function _createLink(onResolveFn, onRejectFn) {
         if (typeof onResolveFn !== 'function') {
             throw new TypeError(typeof onResolveFn + ' is not a onResolveFn function');
         }
@@ -27,7 +27,7 @@ define([
         return new ThenLink(onResolveFn, onRejectFn);
     }
 
-    function push(thenLink) {
+    function _push(thenLink) {
         if (!(thenLink instanceof ThenLink)) {
             throw new TypeError(typeof thenLink + ' is not a ThenLink object');
         }
@@ -43,15 +43,15 @@ define([
         return this;
     }
 
-    function getOnResolveFn() {
-        return getNextOnEndFn(this, 'onResolveFn');
+    function _getOnResolveFn() {
+        return _getNextOnEndFn(this, 'onResolveFn');
     }
 
-    function getOnRejectFn() {
-        return getNextOnEndFn(this, 'onRejectFn');
+    function _getOnRejectFn() {
+        return _getNextOnEndFn(this, 'onRejectFn');
     }
 
-    function getNextOnEndFn(thenChain, onEndFnName) {
+    function _getNextOnEndFn(thenChain, onEndFnName) {
         if (thenChain.nextLink === null) {
             return null;
         }
@@ -66,7 +66,7 @@ define([
         return null;
     }
 
-    function getClosestLink() {
+    function _getClosestLink() {
         return this.nextLink;
     }
 

@@ -4,8 +4,8 @@ define([
     CheckType
     ) {
     var ThenLinkClass = ThenLink;
-    ThenLinkClass.prototype.push = push;
-    ThenLinkClass.prototype.getLinkWithOnEndFn = getLinkWithOnEndFn;
+    ThenLinkClass.prototype.push = _push;
+    ThenLinkClass.prototype.getLinkWithOnEndFn = _getLinkWithOnEndFn;
 
     function ThenLink(onResolveFn, onRejectFn) {
         this.onResolveFn = onResolveFn;
@@ -13,7 +13,7 @@ define([
         this.nextLink = null;
     }
 
-    function push(thenLink) {
+    function _push(thenLink) {
         if (this.nextLink === null) {
             this.nextLink = thenLink;
 
@@ -25,7 +25,7 @@ define([
         return this;
     }
 
-    function getLinkWithOnEndFn(onEndFnName) {
+    function _getLinkWithOnEndFn(onEndFnName) {
         if (typeof this[onEndFnName] === 'function') {
             return this;
         }

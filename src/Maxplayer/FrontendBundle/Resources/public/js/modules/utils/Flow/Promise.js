@@ -1,110 +1,41 @@
 define([
-    'Utils/CheckType',
-    'Utils/Flow/ThenChain'
+    'Utils/CheckType'
 ], function (
-    CheckType,
-    ThenChain
+    CheckType
     ) {
-    var promiseStatuses = {
-        0: 'not fired',
-        1: 'firing',
-        2: 'resolved',
-        3: 'rejected'
-    };
+    var FlowPromiseClass = FlowPromise;
 
-    var PromiseClass = Promise;
+    FlowPromiseClass.prototype.break = _break;
+    FlowPromiseClass.prototype.check = _check;
+    FlowPromiseClass.prototype.then = _then;
 
-    function Promise(bodyFn) {
-        var _this = this,
-            _bodyFn = bodyFn,
-            _status = 0,//0 - not fired, 1 - firing, 2 - resolved, 3 - rejected
-            _thenChain = new ThenChain;
-        ;
+    function FlowPromise(node) {
+        this._breaked = false;
+        this._promise = Promise.resolve();
+        this._iterator = null;
+    }
 
-        if (typeof _bodyFn !== 'function') {
-            throw new Error('trying to create instance of Promise with no specifying body function: incorrect \'fn\' argument (typeof '+typeof _bodyFn+')')
-        }
+    function _break() {
+        this._breaked = true;
+    }
 
-        //TODO: move out functions from object to prototype (difficult)
-        function _resolve() {
-            _status = 2;
+    function _check(promise) {
+        var _this = this;
 
-            _callOnEndFunction.apply(_this, arguments);
-        }
-
-        function _reject() {
-            _status = 3;
-
-            _callOnEndFunction.apply(_this, arguments);
-        }
-
-        function _then() {
-            var thenLink = _thenChain.createLink.apply(_thenChain, arguments);
-
-            _thenChain.push(thenLink);
-
-            return _this;
-        }
-
-        function _callOnEndFunction() {
-            switch (_status) {
-                case 2:
-                    var onEndFn = _thenChain.getOnResolveFn();
-                    break;
-                case 3:
-                    var onEndFn = _thenChain.getOnRejectFn();
-                    break;
-                default:
-                    throw new Error('unexpected Promise status: ' + _status + 'when calling onEnd function');
+        return function(result) {
+            if (_this._breaked) {
+                throw new Error('track have bean breaked');
             }
 
-            _recursiveCallOnEndFu(onEndFn, arguments);
+            return promise(result);
         }
+    }
 
-        function _recursiveCallOnEndFu(onEndFn, arguments) {
-            if (typeof onEndFn === 'function') {
-                var onEndFnResult = onEndFn.apply(_this, arguments);
+    function _then(resolveFn, rejectFn) {
+        this._promise = this._promise.then(this.check(resolveFn), this.check(rejectFn));
 
-                if (typeof onEndFnResult === 'undefined') {
-                    return;
-                }
+        return this;
+    }
 
-                //TODO: change to:
-                if (onEndFnResult instanceof Promise) {
-                    var closestLink = _thenChain.getClosestLink();
-                    onEndFnResult.getThenChain().push(closestLink);
-                    onEndFnResult.fire();
-                } else {
-                    console.log('TODO! with', onEndFnResult);
-                    var nextOnEndFn = _thenChain.getOnResolveFn();
-
-                    _recursiveCallOnEndFu(nextOnEndFn, [onEndFnResult]);
-                }
-            }
-        }
-
-        function _fireBodyFn() {
-            if (_status === 0) {
-                _status = 1;
-
-                bodyFn.call(_this, _resolve, _reject);
-            }
-
-            return _this;
-        }
-
-        function _validateOnEndStatus(onEndEventStatus) {
-            if (_status !== 1) {
-                throw new Error('calling Promise event \''+promiseStatuses[onEndEventStatus]+'\' on Promise with status \''+promiseStatuses[_status]+'\'');
-            }
-        }
-
-        this.then = _then;
-        this.fire = _fireBodyFn;
-        this.getThenChain = function() {
-            return _thenChain;
-        }
-    };
-
-    return PromiseClass;
+    return FlowPromise;
 });
