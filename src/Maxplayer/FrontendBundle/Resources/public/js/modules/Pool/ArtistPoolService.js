@@ -26,20 +26,24 @@ define([
         return new Promise(function(resolve, reject) {
             LastFmResourceService
                 .artistGetSimilar(request)
-                .done(function(responce) {
-                    var errorMessage = LastFmResourceService.catchError(responce);
-                    if (errorMessage) {
-                        reject(errorMessage);
+                .then(function(responce) {
+                        var errorMessage = LastFmResourceService.catchError(responce);
+                        if (errorMessage) {
+                            reject(errorMessage);
 
-                        return;
+                            return;
+                        }
+
+                        var artists = _.map(responce.similarartists.artist, function(item, key) {
+                            return _this.findOrCreate(item);
+                        });
+
+                        resolve(artists);
+                    },
+                    function(responce) {
+                        reject(responce);
                     }
-
-                    var artists = _.map(responce.similarartists.artist, function(item, key) {
-                        return _this.findOrCreate(item);
-                    });
-
-                    resolve(artists);
-                })
+                )
             ;
         });
     }
