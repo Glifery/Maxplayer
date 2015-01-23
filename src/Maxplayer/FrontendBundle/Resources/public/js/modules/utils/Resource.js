@@ -27,13 +27,21 @@ define([
             }
         };
 
+    var ResourceClass = Resource;
+
+    function Resource(opts) {
+        this.opts = $.extend(true, defaultOpts, opts);
+    }
+
+    ResourceClass.prototype.addRoute = _addRoute;
+
     /**
      *
      * @param object fields
      * @param object obj
      * @returns {boolean}
      */
-    function checkExisting(fields, obj) {
+    function _checkExisting(fields, obj) {
         var isError = false;
         consoleProcess.log('checkExisting beg', fields, obj);
 
@@ -56,7 +64,7 @@ define([
      * @param object opts
      * @returns {*}
      */
-    function prepareUrl(url, opts) {
+    function _prepareUrl(url, opts) {
         var textTransformer = $text();
         consoleProcess.log('prepareUrl beg', url, opts);
 
@@ -79,20 +87,14 @@ define([
         return url;
     }
 
-    var Resource = function(opts) {
-        this.opts = $.extend(true, defaultOpts, opts);
-    }
-
-    Resource.prototype.addRoute = addRoute;
-
     /**
      *
      * @param string name
      * @param object routeOpts
      * @returns Resource
      */
-    function addRoute(name, routeOpts) {
-        var routeFunction = createRouteFunction(routeOpts, this.opts);
+    function _addRoute(name, routeOpts) {
+        var routeFunction = _createRouteFunction(routeOpts, this.opts);
 
         this[name] = routeFunction;
 
@@ -105,7 +107,7 @@ define([
      * @param object resourceOpts
      * @returns {Function}
      */
-    function createRouteFunction(routeOpts, resourceOpts) {
+    function _createRouteFunction(routeOpts, resourceOpts) {
         var opts = {},
             routeUrl = '';
 
@@ -121,25 +123,94 @@ define([
         _.extend(opts, resourceOpts, routeOpts);
         _.extend(opts.params, resourceOpts.params, routeOpts.params);
 
-        opts.url = prepareUrl(routeUrl, opts);
+        opts.url = _prepareUrl(routeUrl, opts);
 
-        checkExisting(requiredOptsFields, opts);
+        _checkExisting(requiredOptsFields, opts);
 
         return function(params) {
             var ajaxParams = $.extend(true, opts.params, params),
-                ajaxData = opts;
+                ajaxData = opts,
+                ajaxPromise = null,
+                requestPromise = null;
 
             ajaxData.data = ajaxParams;
 
-            return $.ajax(ajaxData).done(defaultSuccessCallback).fail(defaultErrorCallback);
+            ajaxPromise = _returnAjaxPromise(ajaxData);
+
+            return ajaxPromise;
         }
     }
 
-    function defaultSuccessCallback(responce, textStatus, xhr) {
+    function _returnAjaxPromise(ajaxData) {
+        var ajaxPromise = new Promise(function(ajaxResolve, apaxReject) {
+                $.ajax(ajaxData)
+                    .done(_defaultSuccessCallback)
+                    .done(function(responce) {ajaxResolve(responce)})
+                    .fail(_defaultErrorCallback)
+                    .fail(function(xhr) {apaxReject(xhr)});
+            })
+            .then(
+                function(result) {
+                    var newResult;
+
+                    if (ajaxData.hasOwnProperty('done') && (checkType.func(ajaxData.done))) {
+                        newResult = ajaxData.done(result);
+                        if (checkType.exists(newResult)) {
+                            return Promise.resolve(newResult);
+                        }
+                    }
+
+                    return Promise.resolve(result);
+                },
+                function(result) {
+                    var newResult;
+
+                    if (ajaxData.hasOwnProperty('fail') && (checkType.func(ajaxData.fail))) {
+                        newResult = ajaxData.fail(result);
+                        if (checkType.exists(newResult)) {
+                            return Promise.reject(newResult);
+                        }
+                    }
+
+                    return Promise.reject(result);
+                }
+            )
+            .then(
+                function(result) {
+                    var newResult;
+
+                    if (ajaxData.hasOwnProperty('then') && (checkType.func(ajaxData.then))) {
+                        newResult = ajaxData.then(result);
+                        if (checkType.exists(newResult)) {
+                            return Promise.resolve(newResult);
+                        }
+                    }
+
+                    return Promise.resolve(result);
+                },
+                function(result) {
+                    var newResult;
+
+                    if (ajaxData.hasOwnProperty('then') && (checkType.func(ajaxData.then))) {
+                        newResult = ajaxData.then(result);
+                        if (checkType.exists(newResult)) {
+                            return Promise.reject(newResult);
+                        }
+                    }
+
+                    return Promise.reject(result);
+                }
+            )
+        ;
+
+        return ajaxPromise;
+    }
+
+    function _defaultSuccessCallback(responce, textStatus, xhr) {
         consoleAjax.info('ajax', xhr.status, xhr.statusText, this.url, responce, xhr);
     }
 
-    function defaultErrorCallback(xhr) {
+    function _defaultErrorCallback(xhr) {
         try {
             var response = $.parseJSON(xhr.responseText),
                 code   = response.code || '500',
@@ -153,9 +224,5 @@ define([
         consoleError.error('ajax error:', code, message);
     }
 
-    return {
-        create: function(opts) {
-            return new Resource(opts);
-        }
-    }
+    return Resource;
 });
