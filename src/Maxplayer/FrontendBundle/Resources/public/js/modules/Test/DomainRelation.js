@@ -10,13 +10,14 @@ define([
     var artist = new Artist;
     artist.set('name', 'ABBA');
 
+    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     console.log('This is DomainRelation', ArtistPoolService);
     ArtistPoolService.getSimilar(artist).then(
         function(artists) {
             console.log('artists', artists);
         },
         function(errorMessage) {
-            console.log('errorMessage', errorMessage);
+            console.error(errorMessage.message);
         }
     );
 });
