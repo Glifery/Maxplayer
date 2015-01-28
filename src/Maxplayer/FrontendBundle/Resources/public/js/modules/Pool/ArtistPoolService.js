@@ -4,6 +4,7 @@ define([
     'underscore',
     'Pool/DomainPool',
     'Api/LastFmResourceService',
+    'Domain/Collection',
     'Domain/Artist'
 ], function (
     CheckType,
@@ -11,6 +12,7 @@ define([
     _,
     DomainPool,
     LastFmResourceService,
+    Collection,
     Artist
 ) {
     var ArtistPoolServiceClass = ArtistPoolService;
@@ -29,11 +31,16 @@ define([
             LastFmResourceService
                 .artistGetSimilar(request)
                 .then(function(responce) {
-                        var artists = _.map(responce.similarartists.artist, function(item, key) {
-                            return _this.findOrCreate(item);
+                        var collection = new Collection();
+
+                        _.each(responce.similarartists.artist, function(item) {
+                            var domain = _this.findOrCreate(item),
+                                sort = parseFloat(item.match);
+
+                            collection.addDomain(domain, sort);
                         });
 
-                        resolve(artists);
+                        resolve(collection);
                     },
                     function(responce) {
                         reject(responce);
