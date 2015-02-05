@@ -1,23 +1,30 @@
 //http://maxplayer.my/app_dev.php/test/module/Test-DomainRelation
 
 define([
-    'Domain/Artist',
-    'Pool/ArtistPoolService'
+    'Pool/DomainBinderService',
+    'Domain/Artist'
 ], function (
-    Artist,
-    ArtistPoolService
+    DomainBinderService,
+    Artist
     ) {
-    var artist = new Artist;
+    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+    console.log('This is DomainRelation');
+
+    var artist = new Artist();
     artist.set('name', 'ABBA');
 
-    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    console.log('This is DomainRelation', ArtistPoolService);
-    ArtistPoolService.getSimilar(artist).then(
-        function(artists) {
-            console.log('artists', artists);
-        },
-        function(errorMessage) {
-            console.error(errorMessage.message);
-        }
-    );
+    artist.similar().then(function(collection) {
+        var domains = collection.getDomains();
+
+        console.log('DONE!!!', domains);
+    });
+
+//    ArtistPoolService.getSimilar(artist).then(
+//        function(artists) {
+//            console.log('artists', artists);
+//        },
+//        function(errorMessage) {
+//            console.error(errorMessage.message);
+//        }
+//    );
 });

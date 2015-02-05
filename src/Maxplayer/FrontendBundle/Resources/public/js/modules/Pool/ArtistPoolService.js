@@ -4,16 +4,16 @@ define([
     'underscore',
     'Pool/DomainPool',
     'Api/LastFmResourceService',
-    'Domain/Collection',
-    'Domain/Artist'
+    'Domain/Artist',
+    'Domain/Collection'
 ], function (
     CheckType,
     Debug,
     _,
     DomainPool,
     LastFmResourceService,
-    Collection,
-    Artist
+    Artist,
+    Collection
 ) {
     var ArtistPoolServiceClass = ArtistPoolService;
     ArtistPoolServiceClass.prototype = new DomainPool;

@@ -14,6 +14,7 @@ define([
 
     var Collection = Backbone.Collection.extend({
         model: Domain,
+
         addDomain: function(domain, sort) {
             var element = new CollectionElement({
                 domain: domain,
@@ -22,6 +23,13 @@ define([
 
             this.add(element);
         },
+
+        getDomains: function(amount) {
+            return this.map(function(element) {
+                return element.get('domain');
+            })
+        },
+
         comparator: function(element) {
             return - element.get("sort");
         }
