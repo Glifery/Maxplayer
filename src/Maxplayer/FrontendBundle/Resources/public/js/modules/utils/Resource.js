@@ -128,11 +128,11 @@ define([
         _checkExisting(requiredOptsFields, opts);
 
         return function(params) {
-            var ajaxParams = $.extend(true, opts.params, params),
-                ajaxData = opts,
-                ajaxPromise = null,
-                requestPromise = null;
+            var ajaxParams = {},
+                ajaxData = opts
+            ;
 
+            $.extend(true, ajaxParams, opts.params, params);
             ajaxData.data = ajaxParams;
 
             ajaxPromise = _returnAjaxPromise(ajaxData);

@@ -5,26 +5,28 @@ define([
 ], function (
     CheckType,
     Debug,
-    $resource
+    Resource
 ) {
     lastfmConnect = {
         apiKey: 'fa8a3b21a540363fa91c6ae12a7a35e3',
         apiSecret: '2708824bc8f3b18ee53b17561adcaedc'
     }
 
-    var lastfm = $resource.create({
+    var lastfm = new Resource({
         url: 'http://ws.audioscrobbler.com/2.0/',
         method: 'GET',
         params: {
             api_key: lastfmConnect.apiKey,
             format: 'json'
-        }
+        },
+        done: _catchError
     });
 
     lastfm
         .addRoute('artistSearch', {
             params: {
-                method: 'artist.search'
+                method: 'artist.search',
+                limit: 5
             }
         })
         .addRoute('artistGetSimilar', {
@@ -36,14 +38,12 @@ define([
         })
     ;
 
-    lastfm.catchError = _catchError;
-
     function _catchError(responce) {
         if (responce.hasOwnProperty('error')) {
-            return 'LastFM API error (' + responce['error'] + '): ', responce['message'];
+            throw new Error('LastFM API error (' + responce['error'] + '): ' + responce['message']);
         }
 
-        return null;
+//        return responce;
     }
 
     return lastfm;
