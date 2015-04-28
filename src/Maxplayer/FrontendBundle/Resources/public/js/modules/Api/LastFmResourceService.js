@@ -25,7 +25,8 @@ define([
     lastfm
         .addRoute('artistSearch', {
             params: {
-                method: 'artist.search'
+                method: 'artist.search',
+                limit: 5
             }
         })
         .addRoute('artistGetSimilar', {
