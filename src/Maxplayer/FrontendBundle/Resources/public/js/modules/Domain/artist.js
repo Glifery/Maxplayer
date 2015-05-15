@@ -1,12 +1,6 @@
 define([
-    'Utils/CheckType',
-    'Utils/Debug',
-    'backbone',
     'Domain/Domain'
 ], function (
-    CheckType,
-    Debug,
-    Backbone,
     Domain
 ) {
     var domain = 'artist';
