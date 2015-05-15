@@ -1,24 +1,7 @@
 define([
-    'Utils/CheckType',
-    'Utils/Debug',
-    'backbone',
-    'Domain/Domain'
+    'Pool/DomainBinderService'
 ], function (
-    CheckType,
-    Debug,
-    Backbone,
-    Domain
+    DomainBinderService
 ) {
-    var domain = 'artist';
-
-    var Artist = Domain.extend({
-        defaults: {
-            name: null,
-            mbid: null,
-            images: null
-        },
-        domain: domain
-    });
-
-    return Artist;
+    
 });
