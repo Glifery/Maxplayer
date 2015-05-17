@@ -43,8 +43,11 @@ define([
         if (info.hasOwnProperty('name')) {
             domain.set('name', info.name);
         }
-        if (info.hasOwnProperty('name')) {
-            domain.set('name', info.name);
+        if (info.hasOwnProperty('artist')) {
+            domain.set('artist', info.artist);
+        }
+        if (info.hasOwnProperty('id')) {
+            domain.set('id', info.id);
         }
         if (info.hasOwnProperty('image')) {
             domain.set('images', _normalizeImages(info.image));

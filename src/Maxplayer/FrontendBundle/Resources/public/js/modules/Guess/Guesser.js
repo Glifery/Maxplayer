@@ -20,13 +20,41 @@ define([
         },
         submit: function() {
             var that = this,
-                query = this.get('query')
+                query = this.get('query'),
+                promises = [
+                    ProvidersSet
+                        .searchArtist(query)
+                        .then(function(collection) {
+                            that.set('artist', collection);
+                        })
+                    ,
+
+                    ProvidersSet
+                        .searchAlbum(query)
+                        .then(function(collection) {
+                            that.set('album', collection);
+                        })
+                    ,
+
+                    ProvidersSet
+                        .searchTrack(query)
+                        .then(function(collection) {
+                            that.set('track', collection);
+                        })
+                    ,
+
+                    ProvidersSet
+                        .searchTag(query)
+                        .then(function(collection) {
+                            that.set('tag', collection);
+                        })
+                ]
             ;
 
-            ProvidersSet
-                .searchArtist(query)
-                .then(function(collection) {
-                    that.set('artist', collection);
+            Promise
+                .all(promises)
+                .then(function() {
+                    that.trigger('change:all', that);
                 })
             ;
         }

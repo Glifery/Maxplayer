@@ -36,6 +36,37 @@ define([
                 limit: 10
             }
         })
+        .addRoute('albumSearch', {
+            params: {
+                method: 'album.search',
+                limit: 5
+            }
+        })
+        .addRoute('trackSearch', {
+            params: {
+                method: 'track.search',
+                limit: 5
+            }
+        })
+        .addRoute('trackGetSimilar', {
+            params: {
+                method: 'track.getSimilar',
+                autocorrect: 1,
+                limit: 10
+            }
+        })
+        .addRoute('tagSearch', {
+            params: {
+                method: 'tag.search',
+                limit: 5
+            }
+        })
+        .addRoute('tagGetSimilar', {
+            params: {
+                method: 'tag.getSimilar',
+                limit: 10
+            }
+        })
     ;
 
     function _catchError(responce) {
