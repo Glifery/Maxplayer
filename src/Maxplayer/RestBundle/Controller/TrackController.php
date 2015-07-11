@@ -22,8 +22,6 @@ class TrackController extends Controller
         $inputOutputGate = $this->get('maxplayer_rest.input_output_gate');
         $vkRepository = $this->get('maxplayer_vk_request.vk_repository');
 
-        $inputOutputGate->setRequest($request);
-
         try {
             $track = $this->createTrackFromRequest();
         } catch (\Exception $e) {
@@ -47,23 +45,23 @@ class TrackController extends Controller
      */
     private function createTrackFromRequest()
     {
-        $trackRawData = $this->get('maxplayer_rest.input_output_gate')->getRequestDate();
+        $request = $this->get('request');
+        $inputOutputGate = $this->get('maxplayer_rest.input_output_gate');
 
-        if (!isset($trackRawData['artist']) || !strlen($trackRawData['artist'])) {
+        $inputOutputGate->setRequest($request);
+        $trackRawData = $inputOutputGate->getRequestDate();
+
+        if (!isset($trackRawData['track']['artist']) || !strlen($trackRawData['track']['artist'])) {
             throw new BadRequestHttpException('Invalid parameter track[artist]');
         }
-        if (!isset($trackRawData['track']) || !strlen($trackRawData['track'])) {
+        if (!isset($trackRawData['track']['track']) || !strlen($trackRawData['track']['track'])) {
             throw new BadRequestHttpException('Invalid parameter track[track]');
-        }
-        if (!isset($trackRawData['duration']) || !strlen($trackRawData['duration'])) {
-            throw new BadRequestHttpException('Invalid parameter track[duration]');
         }
 
         $track = new Track();
         $track
-            ->setArtist($trackRawData['artist'])
-            ->setTrack($trackRawData['track'])
-            ->setDuration($trackRawData['duration'])
+            ->setArtist($trackRawData['track']['artist'])
+            ->setTrack($trackRawData['track']['track'])
         ;
 
         return $track;
