@@ -177,7 +177,7 @@ class VkTransport
     public function call($methodName, array $params = null)
     {
         if (!$this->token) {
-            $this->registerError('Trying to use api for ID \''.$this->apiKey.'\' without token');
+            $this->registerError('Trying to use api for ID \''.$this->apiKey.'\' without token. To get token visit %vk_api.auth_path%');
 
             return null;
         }
