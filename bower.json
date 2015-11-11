@@ -1,0 +1,24 @@
+{
+  "name": "maxplayer.my",
+  "homepage": "https://github.com/Glifery/Maxplayer",
+  "authors": [
+    "Glifery <glifery@gmail.com>"
+  ],
+  "description": "maxplayer",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "src/Maxplayer/FrontendBundle/Resources/public/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4",
+    "bootstrap": "~3.3.5",
+    "requirejs": "~2.1.20"
+  }
+}
