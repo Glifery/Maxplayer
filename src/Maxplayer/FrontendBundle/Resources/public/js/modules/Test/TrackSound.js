@@ -4,15 +4,17 @@ define([
     'App',
     'Guess/Guesser',
     'jquery',
-    'Pool/SoundPoolService'
+    'Pool/SoundPoolService',
+    'Utils/Soundmanager'
 ], function (
     App,
     Guesser,
     $,
-    SoundPoolService
+    SoundPoolService,
+    Soundmanager
     ) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    console.log('This is Guesser');
+    console.log('This is Guesser', Soundmanager);
 
     var guesser = new Guesser;
 
@@ -26,6 +28,17 @@ define([
                 .fillSound(track)
                 .then(function() {
                     console.log('FILLED  TRACK!! data', track);
+
+                    Soundmanager.createSound({
+                        id: 'mySound',
+                        url: track.get('sound'),
+                        autoLoad: true,
+                        autoPlay: true,
+                        onload: function() {
+                            alert('The sound '+this.id+' loaded!');
+                        },
+                        volume: 50
+                    });
                 })
             ;
         });
