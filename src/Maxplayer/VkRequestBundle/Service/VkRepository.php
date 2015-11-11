@@ -11,11 +11,18 @@ class VkRepository
     /** @var \Maxplayer\VkRequestBundle\Service\VkGate */
     private $vkGate;
 
+    /**
+     * @param VkGate $vkGate
+     */
     public function __construct(VkGate $vkGate)
     {
         $this->vkGate = $vkGate;
     }
 
+    /**
+     * @param Track $track
+     * @return bool
+     */
     public function fillTrackSound(Track $track)
     {
         $query = $track->getArtist().' - '.$track->getTrack();

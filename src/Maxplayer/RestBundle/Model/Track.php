@@ -91,4 +91,17 @@ class Track
     {
         return $this->track;
     }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return array(
+          'artist'   => $this->getArtist(),
+          'track'    => $this->getTrack(),
+          'duration' => $this->getDuration(),
+          'sound'    => $this->getSound()
+        );
+    }
 }

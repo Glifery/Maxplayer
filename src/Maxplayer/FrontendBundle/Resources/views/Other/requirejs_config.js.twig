@@ -5,7 +5,8 @@ require.config({
         "jquery": "//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min",
         "backbone": "//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min",
         "underscore": "//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min",
-        "qunit": "//cdnjs.cloudflare.com/ajax/libs/qunit/1.14.0/qunit.min.js"
+        "qunit": "//cdnjs.cloudflare.com/ajax/libs/qunit/1.14.0/qunit.min.js",
+        "soundmanager": "https://cdnjs.cloudflare.com/ajax/libs/soundmanager2/2.97a.20150601/script/soundmanager2-jsmin"
     },
     "shim": {
         'backbone': {
@@ -14,6 +15,9 @@ require.config({
         },
         'underscore': {
             exports: '_'
+        },
+        'soundmanager': {
+            exports: 'soundManager'
         },
         'qunit': {
             exports: 'QUnit',

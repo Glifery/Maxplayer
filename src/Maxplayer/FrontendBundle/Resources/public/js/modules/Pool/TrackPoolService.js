@@ -29,7 +29,6 @@ define([
         var _this = this,
             request = this.createRequestByDomain(domain, this.domainCode)
         ;
-        console.log('similar to', request);
 
         return new Promise(function(resolve, reject) {
             LastFmResourceService
