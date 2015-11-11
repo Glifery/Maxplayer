@@ -13,3 +13,6 @@ maxplayer_test_vk_request:
 maxplayer_test_rest_track:
     path:     /test/rest/track
     defaults: { _controller: MaxplayerTestBundle:Rest:track }
+maxplayer_test_frontend_assets:
+    path:     /test/frontend/assets
+    defaults: { _controller: MaxplayerTestBundle:Frontend:index }

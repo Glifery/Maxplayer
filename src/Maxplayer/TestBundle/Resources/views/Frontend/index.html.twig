@@ -1,0 +1,11 @@
+{% extends '::base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    {{ require_js_initialize() }}
+
+    <script type="text/javascript">require(['Test/TrackSound'])</script>
+{% endblock %}
+
+{% block body %}SHOW ME!{% endblock %}

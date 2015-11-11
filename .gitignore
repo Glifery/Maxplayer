@@ -22,6 +22,10 @@
 !bin/symfony_requirements
 /vendor/
 
+# NPM and Bower
+src/Maxplayer/FrontendBundle/Resources/public/vendor/*
+/node_modules/*
+
 # Assets and user uploads
 /web/bundles/
 /web/uploads/

@@ -1,3 +1,11 @@
 {% extends 'MaxplayerFrontendBundle::frontend_layout.html.twig' %}
 
-{% block requirejs_main %}{{ path('maxplayer_frontend_requirejs_main_test_module', {'module': modulePath}) }}{% endblock requirejs_main %}
+{% block javascripts %}
+    {{ parent() }}
+    {{ require_js_initialize() }}
+    <script type="text/javascript">require(['{{ modulePath }}'])</script>
+{% endblock javascripts %}
+
+{% block body %}
+    <p>this is <b>{{ modulePath }}</b> module tester</p>
+{% endblock body %}

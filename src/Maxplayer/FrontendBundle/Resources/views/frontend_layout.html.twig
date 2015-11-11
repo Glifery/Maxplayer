@@ -1,6 +1,1 @@
 {% extends '::base.html.twig' %}
-
-{% block javascripts %}
-    {{ parent() }}
-    <script data-main="{% block requirejs_main %}{{ path('maxplayer_frontend_requirejs_main') }}{% endblock requirejs_main %}" src="{{ asset('bundles/maxplayerfrontend/js/vendor/require.js') }}"></script>
-{% endblock javascripts %}
