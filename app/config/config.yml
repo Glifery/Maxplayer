@@ -116,22 +116,6 @@ hearsay_require_js:
                 warnings: true
                 mangle: false
 
-maxplayer_vk_api:
-    app_key: 4617137
-    app_secret: wjv0oh8UWSJVHpbSSqLG
-    app_scope:
-        - friends
-        - photos
-        - audio
-        - video
-        - docs
-        - status
-        - email
-        - notifications
-        - stats
-        - offline
-    auth_path: auth
-
 glifery_vk_oauth_token:
     app_key: 4617137
     app_secret: wjv0oh8UWSJVHpbSSqLG
