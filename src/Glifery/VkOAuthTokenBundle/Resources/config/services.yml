@@ -1,0 +1,28 @@
+services:
+
+    glifery_vk_oauth_token.oauth_provider:
+        class: Glifery\VkOAuthTokenBundle\Service\OAuthProvider
+        arguments:
+            app_key:    %glifery_vk_oauth_token.app_key%
+            app_secret: %glifery_vk_oauth_token.app_secret%
+            app_scope:  %glifery_vk_oauth_token.app_scope%
+
+    glifery_vk_oauth_token.token_manager:
+        class: Glifery\VkOAuthTokenBundle\Service\TokenManager
+        arguments:
+            app_ley:              %glifery_vk_oauth_token.app_key%
+            token_owner_provider: @glifery_vk_oauth_token.token_owner_provider
+            em:                   @doctrine.orm.entity_manager
+
+    glifery_vk_oauth_token.token_owner_provider:
+        class: Glifery\VkOAuthTokenBundle\Service\TokenOwnerProvider
+        arguments:
+            token_storage: @security.token_storage
+
+    glifery_vk_oauth_token.vk_oauth:
+        class: Glifery\VkOAuthTokenBundle\Service\VkOAuth
+        arguments:
+            oauth_provider: @glifery_vk_oauth_token.oauth_provider
+            token_manager:  @glifery_vk_oauth_token.token_manager
+            router:         @router
+            logger:         @monolog.logger.vk_oauth_token

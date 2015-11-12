@@ -119,7 +119,7 @@ class VkTransport
      * @param $redirectUrl
      * @return string
      */
-    public function getAuthUrl($redirectUrl)
+    public function generateOAuthUrl($redirectUrl)
     {
         $this->vkAuth
             ->setRedirectUri($redirectUrl)
@@ -133,7 +133,7 @@ class VkTransport
      * @param string $redirectUri
      * @return bool
      */
-    public function getNewTokenByCode($code, $redirectUri)
+    public function requestTokenByCode($code, $redirectUri)
     {
         $this->vkAuth->setRedirectUri($redirectUri);
 

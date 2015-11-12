@@ -1,0 +1,7 @@
+glifery_vk_oauth_token.oauth_request:
+    path:     /request
+    defaults: { _controller: GliferyVkOAuthTokenBundle:OAuth:request }
+
+glifery_vk_oauth_token.oauth_callback:
+    path:     /_oauth_callback
+    defaults: { _controller: GliferyVkOAuthTokenBundle:OAuth:callback }

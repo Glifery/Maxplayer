@@ -1,3 +1,7 @@
+glifery_vk_oauth_token:
+    resource: "@GliferyVkOAuthTokenBundle/Resources/config/routing.yml"
+    prefix:   /tools/vk_oauth
+
 maxplayer_frontend:
     resource: "@MaxplayerFrontendBundle/Resources/config/routing.yml"
     prefix:   /

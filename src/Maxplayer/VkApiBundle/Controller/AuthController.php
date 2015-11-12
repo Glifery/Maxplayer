@@ -17,7 +17,7 @@ class AuthController extends Controller
         $redirectUri = $request->getScheme() . '://' . $request->getHttpHost() . $router->generate('maxplayer_vk_api_auth_link');
 
         if ($code = $request->query->get('code')) {
-            if ($vkTransport->getNewTokenByCode($code, $redirectUri)) {
+            if ($vkTransport->requestTokenByCode($code, $redirectUri)) {
                 $this->get('session')->getFlashBag()->add(
                     'auth_success',
                     'Получен новый токен: '.$vkTransport->getToken()->getToken()
@@ -33,8 +33,9 @@ class AuthController extends Controller
         }
 
         return $this->render('MaxplayerVkApiBundle:Auth:link.html.twig', array(
+                'oAuthUrl' => $vkTransport->generateOAuthUrl($redirectUri),
+
                 'apiKey' => $vkTransport->getApiKey(),
-                'authUrl' => $vkTransport->getAuthUrl($redirectUri),
                 'token' => $vkTransport->getToken()
             ));
     }
