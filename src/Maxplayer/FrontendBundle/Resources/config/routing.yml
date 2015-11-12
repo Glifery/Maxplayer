@@ -1,16 +1,3 @@
-maxplayer_frontend_homepage:
-    path:     /
-    defaults: { _controller: MaxplayerFrontendBundle:Default:index }
-maxplayer_frontend_requirejs_main:
-    path:     /require/main.js
-    defaults:
-        _controller: FrameworkBundle:Template:template
-        template: 'MaxplayerFrontendBundle:Other:requirejs_main.js.twig'
-
 maxplayer_frontend_test_module:
     path:     /test/module/{modulePath}
     defaults: { _controller: MaxplayerFrontendBundle:Test:testModule }
-maxplayer_frontend_requirejs_main_test_module:
-    path:     /require/test_module.js
-    defaults:
-        _controller: MaxplayerFrontendBundle:Test:testModuleRequireMain

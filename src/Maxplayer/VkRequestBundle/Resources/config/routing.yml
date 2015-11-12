@@ -1,3 +1,0 @@
-maxplayer_vk_request_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: MaxplayerVkRequestBundle:Default:index }

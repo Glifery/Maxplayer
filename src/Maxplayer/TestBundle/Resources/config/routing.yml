@@ -1,6 +1,3 @@
-maxplayer_test_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: MaxplayerTestBundle:Default:index }
 maxplayer_test_vk_auth:
     path:     /test/vk/auth
     defaults: { _controller: MaxplayerTestBundle:Vk:auth }
