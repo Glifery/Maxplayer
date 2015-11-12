@@ -1,0 +1,32 @@
+Glifery\VkOAuthTokenBundle\Entity\Token:
+    type: entity
+    table: vk_oauth_token
+    repositoryClass: Glifery\VkOAuthTokenBundle\Entity\Repository\TokenRepository
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    fields:
+        appKey:
+            name: app_key
+            type: integer
+            nullable: false
+#        owner:
+#            type: string
+#            nullable: true
+        vkUserId:
+            name: vk_user_id
+            type: integer
+            nullable: false
+        token:
+            type: string
+            length: 100
+            nullable: false
+        expired:
+            type: integer
+            nullable: false
+        createdAt:
+            name: created_at
+            type: datetime
+            nullable: false
+            columnDefinition: "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"

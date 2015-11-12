@@ -1,6 +1,6 @@
 <?php
 
-namespace Maxplayer\VkApiBundle\DependencyInjection;
+namespace Glifery\VkOAuthTokenBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('maxplayer_vk_api');
+        $rootNode = $treeBuilder->root('glifery_vk_oauth_token');
 
         $rootNode
             ->children()
@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('app_scope')
                     ->prototype('scalar')->end()
                 ->end()
-                ->scalarNode('auth_path')->defaultValue('auth')->end()
+                ->scalarNode('token_table')->defaultValue('vk_oauth_token')->end()
             ->end()
         ;
 

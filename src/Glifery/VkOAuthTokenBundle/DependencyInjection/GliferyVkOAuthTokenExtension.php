@@ -1,6 +1,6 @@
 <?php
 
-namespace Maxplayer\VkApiBundle\DependencyInjection;
+namespace Glifery\VkOAuthTokenBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class MaxplayerVkApiExtension extends Extension implements PrependExtensionInterface
+class GliferyVkOAuthTokenExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritdoc}
@@ -26,10 +26,10 @@ class MaxplayerVkApiExtension extends Extension implements PrependExtensionInter
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('vk_api.app_key', $config['app_key']);
-        $container->setParameter('vk_api.app_secret', $config['app_secret']);
-        $container->setParameter('vk_api.app_scope', $config['app_scope']);
-        $container->setParameter('vk_api.auth_path', $config['auth_path']);
+        $container->setParameter('glifery_vk_oauth_token.app_key', $config['app_key']);
+        $container->setParameter('glifery_vk_oauth_token.app_secret', $config['app_secret']);
+        $container->setParameter('glifery_vk_oauth_token.app_scope', $config['app_scope']);
+        $container->setParameter('glifery_vk_oauth_token.token_table', $config['token_table']);
     }
 
     /**
@@ -41,14 +41,14 @@ class MaxplayerVkApiExtension extends Extension implements PrependExtensionInter
     {
         $additionalConfig = array(
             'handlers' => array(
-                'vk_api' => array(
+                'vk_oauth_token' => array(
                     'type' => 'stream',
-                    'path' => '%kernel.logs_dir%/vk_api.log',
+                    'path' => '%kernel.logs_dir%/vk_oauth_token.log',
                     'level' => 'debug',
-                    'channels' => 'vk_api'
+                    'channels' => 'vk_oauth_token'
                 )
             ),
-            'channels' => array('vk_api')
+            'channels' => array('vk_oauth_token')
         );
 
         foreach ($container->getExtensions() as $bundleName => $extension) {
@@ -58,5 +58,15 @@ class MaxplayerVkApiExtension extends Extension implements PrependExtensionInter
                     break;
             }
         }
+    }
+
+    /**
+     * The extension alias
+     *
+     * @return string
+     */
+    public function getAlias()
+    {
+        return 'glifery_vk_oauth_token';
     }
 }

@@ -1,0 +1,14 @@
+<h2>Request token page</h2>
+<ul>
+    <li>App key: <i>{{ appKey }}</i></li>
+    <li>App secret: <i>{{ appSecret }}</i></li>
+    <li>Scope: <i>{{ scope|join(', ') }}</i></li>
+</ul>
+<div>
+{% if lastToken %}
+    <p>Last token: <i>{{ lastToken.token }}</i> of user <i>{{ lastToken.vkUserId }}</i> created at <i>{{ lastToken.createdAt|date }}</i></p>
+{% else %}
+    <p><i>No previous tokens</i></p>
+{% endif %}
+</div>
+<div><a href="{{ oAuthUrl }}">Get token</a></div>

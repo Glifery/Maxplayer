@@ -116,7 +116,7 @@ hearsay_require_js:
                 warnings: true
                 mangle: false
 
-maxplayer_vk_api:
+glifery_vk_oauth_token:
     app_key: 4617137
     app_secret: wjv0oh8UWSJVHpbSSqLG
     app_scope:
@@ -130,4 +130,4 @@ maxplayer_vk_api:
         - notifications
         - stats
         - offline
-    auth_path: auth
+    token_table: oauth_token

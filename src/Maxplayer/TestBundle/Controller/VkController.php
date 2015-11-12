@@ -36,22 +36,6 @@ class VkController extends Controller
         return new Response('requestAction');
     }
 
-    public function soundAction()
-    {
-        /** @var VkTransport $vk */
-        $vk = $this->get('maxplayer_vk_api.vk_transport');
-        if ($result = $vk->call('users.get', array(
-                'user_ids' => array(7991516,7991515),
-                'fields' => array('sex', 'city')
-            ))) {
-            $eee = $result;
-        } else {
-            $eee = $vk->getLastError();
-        }
-
-        return new Response('');
-    }
-
     public function authAction()
     {
         $apiKey = $this->container->getParameter('vk_api_key');

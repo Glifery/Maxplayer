@@ -1,46 +1,28 @@
 <?php
 
-namespace Maxplayer\VkApiBundle\Entity;
+namespace Glifery\VkOAuthTokenBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Entity(repositoryClass="\Maxplayer\VkApiBundle\Repository\TokenRepository")
- * @ORM\Table(name="vk_token")
- */
 class Token
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    /** @var integer */
     private $id;
 
-    /**
-     * @ORM\Column(name="app_key", type="integer", nullable=false)
-     */
+    /** @var integer */
     private $appKey;
 
-    /**
-     * @ORM\Column(name="vk_user_id", type="integer", nullable=false)
-     */
+    /** @var string */
+    private $owner;
+
+    /** @var integer */
     private $vkUserId;
 
-    /**
-     * @ORM\Column(type="string", nullable=false)
-     */
+    /** @var string */
     private $token;
 
-    /**
-     * @ORM\Column(type="integer", nullable=false)
-     */
+    /** @var integer */
     private $expired;
 
-    /**
-     * @var \DateTime
-     * @ORM\Column(type="datetime", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-     */
+    /** @var \DateTime */
     private $createdAt;
 
     /**
@@ -97,6 +79,25 @@ class Token
     public function getVkUserId()
     {
         return $this->vkUserId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param mixed $owner
+     * @return $this
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+
+        return $this;
     }
 
     /**

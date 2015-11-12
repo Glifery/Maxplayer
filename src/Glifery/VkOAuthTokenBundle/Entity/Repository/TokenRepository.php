@@ -1,12 +1,18 @@
 <?php
 
-namespace Maxplayer\VkApiBundle\Repository;
+namespace Glifery\VkOAuthTokenBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Maxplayer\VkApiBundle\Entity\Token;
 
 class TokenRepository extends EntityRepository
 {
-    public function getToken($appKey)
+    /**
+     * @param string $appKey
+     * @return Token|null
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getLastToken($appKey)
     {
         $qb = $this->createQueryBuilder('t');
         $result = $qb

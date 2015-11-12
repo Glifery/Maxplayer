@@ -1,4 +1,0 @@
-maxplayer_vk_api_auth_link:
-    path:     %vk_api.auth_path%
-    defaults: { _controller: MaxplayerVkApiBundle:Auth:index }
-    methods:  [GET]

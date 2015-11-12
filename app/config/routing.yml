@@ -1,3 +1,7 @@
+glifery_vk_oauth_token:
+    resource: "@GliferyVkOAuthTokenBundle/Resources/config/routing.yml"
+    prefix:   /tools/vk_oauth
+
 maxplayer_frontend:
     resource: "@MaxplayerFrontendBundle/Resources/config/routing.yml"
     prefix:   /
@@ -9,10 +13,6 @@ maxplayer_rest:
 maxplayer_vk_request:
     resource: "@MaxplayerVkRequestBundle/Resources/config/routing.yml"
     prefix:   /
-
-maxplayer_vk_api:
-    resource: "@MaxplayerVkApiBundle/Resources/config/routing.yml"
-    prefix:   /vk
 
 maxplayer_test:
     resource: "@MaxplayerTestBundle/Resources/config/routing.yml"

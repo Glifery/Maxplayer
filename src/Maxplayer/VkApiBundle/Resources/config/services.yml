@@ -1,9 +1,0 @@
-services:
-    maxplayer_vk_api.vk_transport:
-        class: Maxplayer\VkApiBundle\Service\VkTransport
-        arguments:
-            app_ley: %vk_api.app_key%
-            app_secret: %vk_api.app_secret%
-            app_scope: %vk_api.app_scope%
-            em: @doctrine.orm.entity_manager
-            logger: @monolog.logger.vk_api
