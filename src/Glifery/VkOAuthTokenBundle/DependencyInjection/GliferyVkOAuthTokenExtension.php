@@ -29,6 +29,7 @@ class GliferyVkOAuthTokenExtension extends Extension implements PrependExtension
         $container->setParameter('glifery_vk_oauth_token.app_key', $config['app_key']);
         $container->setParameter('glifery_vk_oauth_token.app_secret', $config['app_secret']);
         $container->setParameter('glifery_vk_oauth_token.app_scope', $config['app_scope']);
+        $container->setParameter('glifery_vk_oauth_token.token_table', $config['token_table']);
     }
 
     /**

@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('app_scope')
                     ->prototype('scalar')->end()
                 ->end()
+                ->scalarNode('token_table')->defaultValue('vk_oauth_token')->end()
             ->end()
         ;
 

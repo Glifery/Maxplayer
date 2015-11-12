@@ -38,9 +38,7 @@ class OAuthController extends Controller
                 ), 400);
         }
 
-        $vkOAuth = $this->get('glifery_vk_oauth_token.vk_oauth');
-        $token = $vkOAuth->requestTokenByCode($code);
-        $ff = $this->get('glifery_vk_oauth_token.token_manager')->getGlobalToken();
+        $this->get('glifery_vk_oauth_token.vk_oauth')->requestTokenByCode($code);
 
         return $this->redirectToRoute('glifery_vk_oauth_token.oauth_request');
     }

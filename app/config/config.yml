@@ -146,3 +146,4 @@ glifery_vk_oauth_token:
         - notifications
         - stats
         - offline
+    token_table: oauth_token

@@ -2,50 +2,27 @@
 
 namespace Glifery\VkOAuthTokenBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Entity(repositoryClass="\Glifery\VkOAuthTokenBundle\Entity\Repository\TokenRepository")
- * @ORM\Table(name="vk_oauth_token")
- */
 class Token
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    /** @var integer */
     private $id;
 
-    /**
-     * @ORM\Column(name="app_key", type="integer", nullable=false)
-     */
+    /** @var integer */
     private $appKey;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    /** @var string */
     private $owner;
 
-    /**
-     * @ORM\Column(name="vk_user_id", type="integer", nullable=false)
-     */
+    /** @var integer */
     private $vkUserId;
 
-    /**
-     * @ORM\Column(type="string", nullable=false)
-     */
+    /** @var string */
     private $token;
 
-    /**
-     * @ORM\Column(type="integer", nullable=false)
-     */
+    /** @var integer */
     private $expired;
 
-    /**
-     * @var \DateTime
-     * @ORM\Column(type="datetime", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-     */
+    /** @var \DateTime */
     private $createdAt;
 
     /**

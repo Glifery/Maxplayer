@@ -26,3 +26,9 @@ services:
             token_manager:  @glifery_vk_oauth_token.token_manager
             router:         @router
             logger:         @monolog.logger.vk_oauth_token
+
+    glifery_vk_oauth_token.table_name_subscriber:
+        class: Glifery\VkOAuthTokenBundle\Subscriber\TableNameSubscriber
+        arguments: [%glifery_vk_oauth_token.token_table%]
+        tags:
+            - { name: doctrine.event_subscriber }
