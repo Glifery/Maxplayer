@@ -1,11 +1,23 @@
 services:
-    maxplayer_vk_request.vk_gate:
-        class: Maxplayer\VkRequestBundle\Service\VkGate
-        arguments: [@maxplayer_vk_api.vk_transport, @maxplayer_vk_request.transform_manager]
+
     maxplayer_vk_request.transform_manager:
         class: Maxplayer\VkRequestBundle\Service\TransformManager
         calls:
             - [ registerTransformer, [audio.search, Maxplayer\VkRequestBundle\Transformer\AudioTransformer]]
+
+    maxplayer_vk_request.vk_connection:
+        class: Maxplayer\VkRequestBundle\Service\VkConnection
+        arguments:
+            token_namager: @glifery_vk_oauth_token.token_manager
+            logger:        @monolog.logger.vk_api
+
+    maxplayer_vk_request.vk_gate:
+        class: Maxplayer\VkRequestBundle\Service\VkGate
+        arguments:
+            vk_connection:     @maxplayer_vk_request.vk_connection
+            transform_manager: @maxplayer_vk_request.transform_manager
+
     maxplayer_vk_request.vk_repository:
         class: Maxplayer\VkRequestBundle\Service\VkRepository
-        arguments: [@maxplayer_vk_request.vk_gate]
+        arguments:
+            vk_gate: @maxplayer_vk_request.vk_gate

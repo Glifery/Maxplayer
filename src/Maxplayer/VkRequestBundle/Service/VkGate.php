@@ -10,19 +10,19 @@ use Maxplayer\VkRequestBundle\Model\ApiResponce;
 
 class VkGate
 {
-    /** @var VkTransport */
-    private $vkTransport;
+    /** @var VkConnection */
+    private $vkConnection;
 
     /** @var TransformManager */
     private $transformManager;
 
     /**
-     * @param VkTransport $vkTransport
+     * @param VkConnection $vkConnection
      * @param TransformManager $transformManager
      */
-    public function __construct(VkTransport $vkTransport, TransformManager $transformManager = null)
+    public function __construct(VkConnection $vkConnection, TransformManager $transformManager = null)
     {
-        $this->vkTransport = $vkTransport;
+        $this->vkConnection = $vkConnection;
         $this->transformManager = $transformManager;
     }
 
@@ -42,10 +42,10 @@ class VkGate
         $method = $apiRequest->getMethod();
         $params = $apiRequest->getParams();
 
-        if ($result = $this->vkTransport->call($method, $params)) {
+        if ($result = $this->vkConnection->call($method, $params)) {
             $this->setResultToResponce($result, $apiResponce);
         } else {
-            $error = $this->vkTransport->getLastError();
+            $error = $this->vkConnection->getLastError();
             $this->registerError($error, $apiResponce);
         }
 
