@@ -10,10 +10,6 @@ maxplayer_rest:
     resource: "@MaxplayerRestBundle/Resources/config/routing.yml"
     prefix:   /rest
 
-maxplayer_vk_request:
-    resource: "@MaxplayerVkRequestBundle/Resources/config/routing.yml"
-    prefix:   /
-
 maxplayer_test:
     resource: "@MaxplayerTestBundle/Resources/config/routing.yml"
     prefix:   /

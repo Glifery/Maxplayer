@@ -20,7 +20,6 @@ class AppKernel extends Kernel
             new Hearsay\RequireJSBundle\HearsayRequireJSBundle(),
 
             new Maxplayer\TestBundle\MaxplayerTestBundle(),
-            new Maxplayer\VkRequestBundle\MaxplayerVkRequestBundle(),
             new Maxplayer\RestBundle\MaxplayerRestBundle(),
             new Maxplayer\FrontendBundle\MaxplayerFrontendBundle(),
             new Glifery\VkOAuthTokenBundle\GliferyVkOAuthTokenBundle(),
