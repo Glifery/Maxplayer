@@ -20,7 +20,7 @@ class TrackController extends Controller
     public function fillTrackSoundAction(Request $request)
     {
         $inputOutputGate = $this->get('maxplayer_rest.input_output_gate');
-        $vkRepository = $this->get('maxplayer_vk_request.vk_repository');
+        $vkOperationHandler = $this->get('maxplayer_rest.vk_operation_handler');
 
         try {
             $track = $this->createTrackFromRequest();
@@ -30,7 +30,7 @@ class TrackController extends Controller
             return $inputOutputGate->getResponce();
         }
 
-        if (!$vkRepository->fillTrackSound($track)) {
+        if (!$vkOperationHandler->fillTrackSound($track)) {
             $inputOutputGate->addError('Can\'t fill track sound');
         }
         $inputOutputGate->setResponceData($track->toArray());

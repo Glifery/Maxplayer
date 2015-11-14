@@ -1,3 +1,8 @@
 services:
+
     maxplayer_rest.input_output_gate:
         class: Maxplayer\RestBundle\Service\InputOutputGate
+
+    maxplayer_rest.vk_operation_handler:
+        class: Maxplayer\RestBundle\Service\VkOperationHandler
+        arguments: [@glifery_vk_api.api, @glifery_vk_oauth_token.token_manager]
