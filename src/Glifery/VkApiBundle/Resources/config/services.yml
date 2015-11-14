@@ -1,0 +1,25 @@
+services:
+
+    glifery_vk_api.api:
+        class: Glifery\VkApiBundle\Api\VkApi
+        arguments:
+            apiRequestFactory:  @glifery_vk_api.factory.api_request
+            apiResponseFactory: @glifery_vk_api.factory.api_response
+            vkConnection:       @glifery_vk_api.connection
+            vkExceptionLogger:  @glifery_vk_api.logger.vk_exception
+
+    glifery_vk_api.connection:
+        class: Glifery\VkApiBundle\Api\VkConnection
+        arguments:
+            apiVersion: %glifery_vk_api.api_version%
+
+    glifery_vk_api.factory.api_request:
+        class: Glifery\VkApiBundle\Factory\ApiRequestFactory
+
+    glifery_vk_api.factory.api_response:
+        class: Glifery\VkApiBundle\Factory\ApiResponseFactory
+
+    glifery_vk_api.logger.vk_exception:
+        class: Glifery\VkApiBundle\Logger\VkExceptionLogger
+        arguments:
+            logger: @monolog.logger.vk_api

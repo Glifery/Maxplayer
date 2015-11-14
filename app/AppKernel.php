@@ -24,6 +24,7 @@ class AppKernel extends Kernel
             new Maxplayer\RestBundle\MaxplayerRestBundle(),
             new Maxplayer\FrontendBundle\MaxplayerFrontendBundle(),
             new Glifery\VkOAuthTokenBundle\GliferyVkOAuthTokenBundle(),
+            new Glifery\VkApiBundle\GliferyVkApiBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
