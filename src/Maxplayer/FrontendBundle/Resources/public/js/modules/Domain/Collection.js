@@ -22,6 +22,20 @@ define([
             });
 
             this.add(element);
+
+            return this;
+        },
+
+        addDomainUnique: function(domain, sort) {
+            var hasDomainFound = this.find(function(collectionElement) {
+                return collectionElement.get('domain') === domain;
+            });
+
+            if (hasDomainFound) {
+                return this;
+            }
+
+            this.addDomain(domain, sort);
         },
 
         getDomains: function(amount) {
