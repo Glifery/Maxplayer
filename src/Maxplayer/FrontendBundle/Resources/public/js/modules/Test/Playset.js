@@ -5,18 +5,22 @@ define([
     'Guess/Guesser',
     'jquery',
     'Pool/SoundPoolService',
-    'Player/Playset'
+    'Player/Playset',
+    'Player/Playlist'
 ], function (
     App,
     Guesser,
     $,
     SoundPoolService,
-    Playset
+    Playset,
+    Playlist
     ) {
-    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++', Playlist);
 
     var guesser = new Guesser;
     var playset = new Playset;
+    var playlist = new Playlist;
+    playlist.setPlayset(playset);
 
     $(function() {
         $('body').append('<input type="text" class="js-input" value="">');
@@ -26,14 +30,21 @@ define([
 
             console.log('..add to playset', playset, track);
             playset
-                .add(track)
-                .add(track)
-                .add(track)
+                .add(this.get('track').getDomains()[0])
+                .add(this.get('track').getDomains()[0])
+                .add(this.get('track').getDomains()[1])
+                .add(this.get('track').getDomains()[2])
+                .add(this.get('track').getDomains()[3])
             ;
 
-            var next = playset.getNext();
-
-            console.log('..next', next);
+            playlist
+                .loadNextTrack(function(next) {
+                    console.log('..!!! loadNextTrack', playlist);
+                })
+                .loadNextTrack(function(next) {
+                    console.log('..!!! loadNextTrack', playlist);
+                })
+            ;
         });
 
         $('.js-input').on('keyup', function() {

@@ -35,15 +35,12 @@ define([
             return this;
         },
 
-        getNext: function() {
-            console.log('function getNext');
-
-            var domain = this._collection.first().get('domain');
-            console.log('domain:', domain);
-
+        getNextTrack: function(callback, scope) {
             //TODO: get artist's track, etc.
+            var domain = this._collection.first().get('domain');
+            callback.call(scope, domain);
 
-            return domain;
+            return this;
         }
     });
 
