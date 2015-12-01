@@ -10,7 +10,7 @@ define([
     Collection
 ){
     var PlaylistClass = Playlist;
-    PlaylistClass.prototype.loadNextTrack = _loadNextTrack;
+    PlaylistClass.prototype.gotoNextTrack = _gotoNextTrack;
     PlaylistClass.prototype.setPlayset = _setPlayset;
 
     function Playlist() {
@@ -25,35 +25,43 @@ define([
         return this;
     }
 
-    function _loadNextTrack(callback, scope) {
-        var loadedTrack = _moveToNext(this._prevCollection, this._nextCollection);
+    function _gotoNextTrack() {
+        var _this = this,
+            loadedTrack = _shiftAndGetNext(this._prevCollection, this._nextCollection)
+        ;
 
         //If there is element in nextCollection
         if (loadedTrack) {
-            callback.call(scope, loadedTrack);
-
-            return this;
+            return Promise.resolve(loadedTrack);
         }
 
         //If nextCollection is empty
-        this._playset.getNextTrack(function(nextTrack) {
-            this._nextCollection.push(nextTrack);
-            _loadNextTrack.call(this, callback, scope);
-        }, this);
-
-        return this;
+        return _getNextFromPlayset(this)
+            .then(function() {
+                return _this.gotoNextTrack();
+            })
+        ;
     }
 
-    function _moveToNext(prevCollection, nextCollection) {
+    function _getNextFromPlayset(playlist) {
+        return playlist._playset
+            .getNextTrack()
+            .then(function(nextTrack) {
+                playlist._nextCollection.addDomain(nextTrack);
+            })
+        ;
+    }
+
+    function _shiftAndGetNext(prevCollection, nextCollection) {
         var nextTrack = nextCollection.shift();
 
         if (!nextTrack) {
             return null;
         }
 
-        prevCollection.push(nextTrack);
+        prevCollection.addDomain(nextTrack.get('domain'));
 
-        return nextTrack;
+        return nextTrack.get('domain');
     }
 
     return PlaylistClass;

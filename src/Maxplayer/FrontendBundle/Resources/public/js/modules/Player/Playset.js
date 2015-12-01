@@ -16,7 +16,7 @@ define([
         _collection: null,
 
         initialize: function() {
-            this._collection = new Collection()
+            this._collection = new Collection();
         },
 
         add: function(domain) {
@@ -35,12 +35,10 @@ define([
             return this;
         },
 
-        getNextTrack: function(callback, scope) {
+        getNextTrack: function() {
             //TODO: get artist's track, etc.
-            var domain = this._collection.first().get('domain');
-            callback.call(scope, domain);
 
-            return this;
+            return Promise.resolve(this._collection.getDomains()[Math.floor(Math.random() * this._collection.length)]);
         }
     });
 

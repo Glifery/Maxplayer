@@ -10,51 +10,46 @@ define([
     var Guesser = Backbone.Model.extend({
         defaults: {
             query: '',
-            genre: new Collection,
             artist: new Collection,
-            track: new Collection,
-            album: new Collection
+            album: new Collection,
+            track: new Collection
         },
+
         initialize: function() {
             this.on('change:query', this.submit);
         },
+
         submit: function() {
-            var that = this,
+            var _this = this,
                 query = this.get('query'),
                 promises = [
                     ProvidersSet
                         .searchArtist(query)
                         .then(function(collection) {
-                            that.set('artist', collection);
+                            _this.set('artist', collection);
                         })
                     ,
 
                     ProvidersSet
                         .searchAlbum(query)
                         .then(function(collection) {
-                            that.set('album', collection);
+                            _this.set('album', collection);
                         })
                     ,
 
                     ProvidersSet
                         .searchTrack(query)
                         .then(function(collection) {
-                            that.set('track', collection);
+                            _this.set('track', collection);
                         })
-                    ,
 
-                    ProvidersSet
-                        .searchTag(query)
-                        .then(function(collection) {
-                            that.set('tag', collection);
-                        })
                 ]
             ;
 
             Promise
                 .all(promises)
                 .then(function() {
-                    that.trigger('change:all', that);
+                    _this.trigger('change:all', _this);
                 })
             ;
         }

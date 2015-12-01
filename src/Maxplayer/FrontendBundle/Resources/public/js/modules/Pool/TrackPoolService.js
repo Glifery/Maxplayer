@@ -33,10 +33,10 @@ define([
         return new Promise(function(resolve, reject) {
             LastFmResourceService
                 .trackGetSimilar(request)
-                .then(function(responce) {
+                .then(function(response) {
                         var collection = new Collection();
 
-                        _.each(responce.similartracks.track, function(item) {
+                        _.each(response.similartracks.track, function(item) {
                             var domain = _this.findOrCreate(item),
                                 sort = parseFloat(item.match)
                             ;
@@ -46,8 +46,8 @@ define([
 
                         resolve(collection);
                     },
-                    function(responce) {
-                        reject(responce);
+                    function(response) {
+                        reject(response);
                     }
                 )
             ;
@@ -62,10 +62,10 @@ define([
         return new Promise(function(resolve, reject) {
             LastFmResourceService
                 .trackSearch(request)
-                .then(function(responce) {
+                .then(function(response) {
                     var collection = new Collection();
 
-                    _.each(responce.results.trackmatches.track, function(item) {
+                    _.each(response.results.trackmatches.track, function(item) {
                         var domain = _this.findOrCreate(item);
 
                         collection.addDomain(domain);
@@ -73,8 +73,8 @@ define([
 
                     resolve(collection);
                 },
-                function(responce) {
-                    reject(responce);
+                function(response) {
+                    reject(response);
                 }
             )
             ;
