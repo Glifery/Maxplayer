@@ -19,6 +19,10 @@ define([
             this._collection = new Collection();
         },
 
+        getCollection: function() {
+            return this._collection;
+        },
+
         add: function(domain) {
             if (!checkType.obj(domain)) {
                 throw new Error('Attempt to add non-object to Playset.');

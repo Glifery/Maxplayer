@@ -21,8 +21,7 @@ define([
 
     var guesser = new Guesser;
     var playset = new Playset;
-    var playlist = new Playlist;
-    playlist.setPlayset(playset);
+    var playlist = new Playlist(playset);
 
     $(function() {
         $('body').append('<input type="text" class="js-input" value="">');
@@ -48,19 +47,17 @@ define([
 
             playlist.gotoNextTrack()
                 .then(function(next) {
-                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist._prevCollection.size(), playlist._nextCollection.size())
+                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
 
                     return playlist.gotoNextTrack();
                 })
                 .then(function(next) {
-                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist._prevCollection.size(), playlist._nextCollection.size())
+                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
 
                     return playlist.gotoNextTrack();
                 })
                 .then(function(next) {
-                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist._prevCollection.size(), playlist._nextCollection.size())
-
-                    return playlist.gotoNextTrack();
+                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
                 })
             ;
         });

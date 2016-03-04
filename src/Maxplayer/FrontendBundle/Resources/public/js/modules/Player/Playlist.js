@@ -1,68 +1,62 @@
 define([
     'Utils/CheckType',
     'Utils/Debug',
+    'underscore',
     'backbone',
     'Domain/Collection'
 ], function(
     checkType,
     debug,
+    _,
     Backbone,
     Collection
 ){
-    var PlaylistClass = Playlist;
-    PlaylistClass.prototype.gotoNextTrack = _gotoNextTrack;
-    PlaylistClass.prototype.setPlayset = _setPlayset;
+    var Playlist = Backbone.Model.extend({
+        defaults: {
+            playset: null,
+            current: null,
+            prevCollection: new Collection(),
+            nextCollection: new Collection()
+        },
 
-    function Playlist() {
-        this._prevCollection = new Collection();
-        this._nextCollection = new Collection();
-        this._playset = null;
-    }
+        initialize: function(playset) {
+            if (playset) {
+                this.set('playset', playset);
+            }
+        },
 
-    function _setPlayset(playset) {
-        this._playset = playset;
+        loadNext: function(amount) {
+            if (!amount) {
+                amount = 1;
+            }
 
-        return this;
-    }
+            if (!this.get('playset')) {
+                throw new Error('Playset is not set in current Playlist');
+            }
 
-    function _gotoNextTrack() {
-        var _this = this,
-            loadedTrack = _shiftAndGetNext(this._prevCollection, this._nextCollection)
-        ;
+            return this.get('playset')
+                .getNextTrack()
+                .then(addToNextCollection(this))
+            ;
+        },
 
-        //If there is element in nextCollection
-        if (loadedTrack) {
-            return Promise.resolve(loadedTrack);
+        gotoNextTrack: function() {
+            if (!this.get('nextCollection') || !this.get('nextCollection').size()) {
+                return this.loadNext(1).then(_.bind(this.gotoNextTrack, this));
+            }
+
+            var nextElement = this.get('nextCollection').shift();
+            this.get('prevCollection').addDomain(nextElement.get('domain'));
+
+            return Promise.resolve(nextElement.get('domain'));
         }
+    });
 
-        //If nextCollection is empty
-        return _getNextFromPlayset(this)
-            .then(function() {
-                return _this.gotoNextTrack();
-            })
-        ;
-    }
-
-    function _getNextFromPlayset(playlist) {
-        return playlist._playset
-            .getNextTrack()
-            .then(function(nextTrack) {
-                playlist._nextCollection.addDomain(nextTrack);
-            })
-        ;
-    }
-
-    function _shiftAndGetNext(prevCollection, nextCollection) {
-        var nextTrack = nextCollection.shift();
-
-        if (!nextTrack) {
-            return null;
+    function addToNextCollection(playlist) {
+        return function(track) {
+            playlist.get('nextCollection').addDomain(track);
         }
-
-        prevCollection.addDomain(nextTrack.get('domain'));
-
-        return nextTrack.get('domain');
     }
 
-    return PlaylistClass;
+    return Playlist;
 });
