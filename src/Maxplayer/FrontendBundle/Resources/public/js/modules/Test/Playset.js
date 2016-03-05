@@ -7,7 +7,8 @@ define([
     'Utils/FlowPromise',
     'Pool/SoundPoolService',
     'Player/Playset',
-    'Player/Playlist'
+    'Player/Playlist',
+    'Player/Player'
 ], function (
     App,
     Guesser,
@@ -15,13 +16,17 @@ define([
     FlowPromise,
     SoundPoolService,
     Playset,
-    Playlist
+    Playlist,
+    Player
     ) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
     var guesser = new Guesser;
     var playset = new Playset;
     var playlist = new Playlist(playset);
+    var player = new Player;
+
+    player.set('playlist', playlist);
 
     $(function() {
         $('body').append('<input type="text" class="js-input" value="">');

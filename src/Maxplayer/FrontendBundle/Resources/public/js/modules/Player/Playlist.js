@@ -25,34 +25,42 @@ define([
             }
         },
 
-        loadNext: function(amount) {
-            if (!amount) {
-                amount = 1;
-            }
-
+        loadNext: function() {
             if (!this.get('playset')) {
                 throw new Error('Playset is not set in current Playlist');
             }
 
             return this.get('playset')
                 .getNextTrack()
-                .then(addToNextCollection(this))
+                .then(pushToNextCollection(this))
             ;
         },
 
         gotoNextTrack: function() {
-            if (!this.get('nextCollection') || !this.get('nextCollection').size()) {
-                return this.loadNext(1).then(_.bind(this.gotoNextTrack, this));
+            var track = pullTrackFromNextCollection(this);
+
+            if (!track) {
+                return this.loadNext().then(_.bind(this.gotoNextTrack, this));
             }
 
-            var nextElement = this.get('nextCollection').shift();
-            this.get('prevCollection').addDomain(nextElement.get('domain'));
+            this.get('prevCollection').addDomain(track);
+            this.set('current', track);
 
-            return Promise.resolve(nextElement.get('domain'));
+            return Promise.resolve(track);
         }
     });
 
-    function addToNextCollection(playlist) {
+    function pullTrackFromNextCollection(playlist) {
+        var nextElement = playlist.get('nextCollection').shift();
+
+        if (!nextElement) {
+            return null;
+        }
+
+        return nextElement.get('domain');
+    }
+
+    function pushToNextCollection(playlist) {
         return function(track) {
             playlist.get('nextCollection').addDomain(track);
         }
