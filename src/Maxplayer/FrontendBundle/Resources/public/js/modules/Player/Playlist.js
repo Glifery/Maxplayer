@@ -19,13 +19,16 @@ define([
             nextCollection: new Collection()
         },
 
-        initialize: function(playset) {
-            if (playset) {
-                this.set('playset', playset);
-            }
+        initialize: function() {
+            this.get('prevCollection').on('add', propagateEventFor(this, 'add:prevCollection', true));
+            this.get('prevCollection').on('remove', propagateEventFor(this, 'remove:prevCollection', true));
+            this.get('prevCollection').on('update', propagateEventFor(this, 'update:prevCollection'));
+            this.get('nextCollection').on('add', propagateEventFor(this, 'add:nextCollection', true));
+            this.get('nextCollection').on('remove', propagateEventFor(this, 'remove:nextCollection', true));
+            this.get('nextCollection').on('update', propagateEventFor(this, 'update:nextCollection'));
         },
 
-        loadNext: function() {
+        loadNextTrack: function() {
             if (!this.get('playset')) {
                 throw new Error('Playset is not set in current Playlist');
             }
@@ -40,15 +43,32 @@ define([
             var track = pullTrackFromNextCollection(this);
 
             if (!track) {
-                return this.loadNext().then(_.bind(this.gotoNextTrack, this));
+                return this.loadNextTrack().then(_.bind(this.gotoNextTrack, this));
             }
 
-            this.get('prevCollection').addDomain(track);
             this.set('current', track);
+            this.get('prevCollection').addDomain(track);
 
             return Promise.resolve(track);
         }
     });
+
+    function propagateEventFor(playlist, collectionName, isDomain) {
+        return function(domainOrCollection, collectionOrEvent) {
+            var collection = null,
+                track = null
+            ;
+
+            if (isDomain) {
+                track = domainOrCollection.get('domain');
+                collection = collectionOrEvent;
+            } else {
+                collection = domainOrCollection;
+            }
+
+            playlist.trigger(collectionName, collection, track);
+        }
+    }
 
     function pullTrackFromNextCollection(playlist) {
         var nextElement = playlist.get('nextCollection').shift();

@@ -23,37 +23,65 @@ define([
 
     var guesser = new Guesser;
     var playset = new Playset;
-    var playlist = new Playlist(playset);
+    var playlist = new Playlist({playset: playset});
     var player = new Player;
 
     player.set('playlist', playlist);
 
     $(function() {
-        $('body').append('<input type="text" class="js-input" value="">');
-        $('body').append('<ul class="js-playset">');
+        $('#container').append('<input type="text" class="js-input" value="">');
+        $('#container').append('<div class="row"><ul class="col-md-6 js-playset"></ul><ul class="col-md-6 js-playlist"></ul></div>');
+
+        playset.getCollection().on('update', function() {
+            $('.js-playset').html('');
+
+            playset.getCollection().each(function(element) {
+                var track = element.get('domain');
+
+                $('.js-playset').append('<li>'+track.get('name')+'</li>');
+            });
+        });
+
+        playlist.on('update:prevCollection change:current update:nextCollection', function(collection, track) {
+            $('.js-playlist').html('');
+
+            playlist.get('prevCollection').each(function(element) {
+                var track = element.get('domain');
+
+                $('.js-playlist').append('<li style="color: red;">'+track.get('name')+'</li>');
+            });
+
+            $('.js-playlist').append('<li style="color: green;">---------------------</li>');
+            if (playlist.get('current')) {
+                $('.js-playlist').append('<li style="color: green;">'+playlist.get('current').get('name')+'</li>');
+            }
+            $('.js-playlist').append('<li style="color: green;">---------------------</li>');
+
+            playlist.get('nextCollection').each(function(element) {
+                var track = element.get('domain');
+
+                $('.js-playlist').append('<li style="color: blue;">'+track.get('name')+'</li>');
+            });
+        });
 
         guesser.on('change:track', function() {
-            var track = this.get('track').getDomains()[0];
+            var loadedSongsAmount = 4;
 
-            playset
-                .add(this.get('track').getDomains()[0])
-                .add(this.get('track').getDomains()[1])
-                .add(this.get('track').getDomains()[2])
-                .add(this.get('track').getDomains()[3])
-                .add(this.get('track').getDomains()[4])
-            ;
-            $('.js-playset')
-                .append('<li>'+this.get('track').getDomains()[0].get('name')+'</li>')
-                .append('<li>'+this.get('track').getDomains()[1].get('name')+'</li>')
-                .append('<li>'+this.get('track').getDomains()[2].get('name')+'</li>')
-                .append('<li>'+this.get('track').getDomains()[3].get('name')+'</li>')
-                .append('<li>'+this.get('track').getDomains()[4].get('name')+'</li>')
-            ;
+            this.get('track').each(function(element) {
+                var track = element.get('domain');
+
+                if (loadedSongsAmount-- <= 0) {
+                    return;
+                }
+
+                playset.add(track);
+            });
 
             playlist.gotoNextTrack()
                 .then(function(next) {
                     console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
 
+                    playlist.loadNextTrack();
                     return playlist.gotoNextTrack();
                 })
                 .then(function(next) {
@@ -63,6 +91,8 @@ define([
                 })
                 .then(function(next) {
                     console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
+
+                    playlist.loadNextTrack();
                 })
             ;
         });

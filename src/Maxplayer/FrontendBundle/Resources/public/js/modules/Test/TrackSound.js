@@ -19,7 +19,7 @@ define([
     var guesser = new Guesser;
 
     $(function() {
-        $('body').append('<input type="text" class="js-input" value="">');
+        $('#body').append('<input type="text" class="js-input" value="">');
 
         guesser.on('change:track', function() {
             var track = this.get('track').getDomains()[0];

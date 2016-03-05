@@ -16,7 +16,7 @@ define([
     var guesser = new Guesser;
 
     $(function() {
-        $('body').append('<input type="text" class="js-input" value="">');
+        $('#container').append('<input type="text" class="js-input" value="">');
 
         guesser.on('change:artist', function() {console.log('ARTIST!!', this.get('artist').getDomains()[0].get('name'))});
         guesser.on('change:album', function() {console.log('ALBUM!!', this.get('album').getDomains()[0].get('name'))});
