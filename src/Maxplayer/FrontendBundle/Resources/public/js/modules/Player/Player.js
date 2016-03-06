@@ -1,11 +1,13 @@
 define([
     'Utils/CheckType',
     'Utils/Debug',
-    'backbone'
+    'backbone',
+    'Pool/SoundPoolService'
 ], function(
     checkType,
     debug,
-    Backbone
+    Backbone,
+    SoundPoolService
 ){
     var Player = Backbone.Model.extend({
         defaults: {
@@ -17,21 +19,39 @@ define([
 
         initialize: function() {
             this.on('change:playlist', changePlaylistListener);
+
+            if (this.get('playlist')) {
+                changePlaylistListener(this, this.get('playlist'));
+            }
+        },
+
+        play: function(track) {
+            var _this = this;
+            console.log('....load', track.get('name'));
+
+            return SoundPoolService
+                .fillSound(track)
+                .then(function() {
+                    return _this.get('soundStream').playInStream(track);
+                })
+            ;
         }
     });
 
-    function changePlaylistListener(model, playlist) {
+    function changePlaylistListener(player, playlist) {
         var pleviousPlaylist = null;
 
-        if (pleviousPlaylist = model.previous('playlist')) {
+        if (pleviousPlaylist = player.previous('playlist')) {
             pleviousPlaylist.off('change:current', changeCurrentListener);
         }
 
-        playlist.on('change:current', changeCurrentListener)
+        if (playlist) {
+            playlist.on('change:current', changeCurrentListener, player)
+        }
     }
 
-    function changeCurrentListener(model, current) {
-        console.log('....play!!', current.get('name'));
+    function changeCurrentListener(playlist, track) {
+        this.play(track);
     }
 
     return Player;

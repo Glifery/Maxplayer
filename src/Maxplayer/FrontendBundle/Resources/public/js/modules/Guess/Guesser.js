@@ -22,29 +22,35 @@ define([
         submit: function() {
             var _this = this,
                 query = this.get('query'),
-                promises = [
-                    ProvidersSet
-                        .searchArtist(query)
-                        .then(function(collection) {
-                            _this.set('artist', collection);
-                        })
-                    ,
-
-                    ProvidersSet
-                        .searchAlbum(query)
-                        .then(function(collection) {
-                            _this.set('album', collection);
-                        })
-                    ,
-
-                    ProvidersSet
-                        .searchTrack(query)
-                        .then(function(collection) {
-                            _this.set('track', collection);
-                        })
-
-                ]
+                promises = []
             ;
+
+            if (!query.length) {
+                return;
+            }
+
+            promises = [
+                ProvidersSet
+                    .searchArtist(query)
+                    .then(function(collection) {
+                        _this.set('artist', collection);
+                    })
+                ,
+
+                ProvidersSet
+                    .searchAlbum(query)
+                    .then(function(collection) {
+                        _this.set('album', collection);
+                    })
+                ,
+
+                ProvidersSet
+                    .searchTrack(query)
+                    .then(function(collection) {
+                        _this.set('track', collection);
+                    })
+
+            ];
 
             Promise
                 .all(promises)

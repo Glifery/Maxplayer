@@ -8,7 +8,8 @@ define([
     'Pool/SoundPoolService',
     'Player/Playset',
     'Player/Playlist',
-    'Player/Player'
+    'Player/Player',
+    'Player/SoundStream'
 ], function (
     App,
     Guesser,
@@ -17,16 +18,16 @@ define([
     SoundPoolService,
     Playset,
     Playlist,
-    Player
+    Player,
+    SoundStream
     ) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
     var guesser = new Guesser;
     var playset = new Playset;
     var playlist = new Playlist({playset: playset});
-    var player = new Player;
-
-    player.set('playlist', playlist);
+    var soundStream = new SoundStream;
+    var player = new Player({playlist: playlist, soundStream: soundStream});
 
     $(function() {
         $('#container').append('<input type="text" class="js-input" value="">');
@@ -65,7 +66,7 @@ define([
         });
 
         guesser.on('change:track', function() {
-            var loadedSongsAmount = 4;
+            var loadedSongsAmount = 1;
 
             this.get('track').each(function(element) {
                 var track = element.get('domain');
@@ -81,19 +82,19 @@ define([
                 .then(function(next) {
                     console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
 
-                    playlist.loadNextTrack();
-                    return playlist.gotoNextTrack();
+                    //playlist.loadNextTrack();
+                    //return playlist.gotoNextTrack();
                 })
-                .then(function(next) {
-                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
-
-                    return playlist.gotoNextTrack();
-                })
-                .then(function(next) {
-                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
-
-                    playlist.loadNextTrack();
-                })
+                //.then(function(next) {
+                //    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
+                //
+                //    return playlist.gotoNextTrack();
+                //})
+                //.then(function(next) {
+                //    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
+                //
+                //    playlist.loadNextTrack();
+                //})
             ;
         });
 
