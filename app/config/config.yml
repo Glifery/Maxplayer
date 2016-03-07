@@ -89,7 +89,7 @@ hearsay_require_js:
             location: /bundles/maxplayerfrontend/vendor/backbone/backbone-min
             external: true
         soundmanager:
-            location: /bundles/maxplayerfrontend/vendor/SoundManager2/script/soundmanager2-nodebug-jsmin
+            location: /bundles/maxplayerfrontend/vendor/SoundManager2/script/soundmanager2-jsmin
             external: true
         bootstrap:
             location: /bundles/maxplayerfrontend/vendor/bootstrap/dist/js/bootstrap.min

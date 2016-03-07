@@ -13,7 +13,7 @@ class Track
     /** @var integer */
     private $duration;
 
-    /** @var string */
+    /** @var Sound */
     private $sound;
 
     /**
@@ -55,10 +55,10 @@ class Track
     }
 
     /**
-     * @param string $sound
+     * @param Sound $sound
      * @return $this
      */
-    public function setSound($sound)
+    public function setSound(Sound $sound)
     {
         $this->sound = $sound;
 
@@ -66,7 +66,7 @@ class Track
     }
 
     /**
-     * @return string
+     * @return Sound
      */
     public function getSound()
     {

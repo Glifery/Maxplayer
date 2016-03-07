@@ -26,14 +26,11 @@ define([
         },
 
         play: function(track) {
-            var _this = this;
-            console.log('....load', track.get('name'));
+            this.get('soundStream').stopCurrent();
 
             return SoundPoolService
                 .fillSound(track)
-                .then(function() {
-                    return _this.get('soundStream').playInStream(track);
-                })
+                .then(playInStream(this))
             ;
         }
     });
@@ -52,6 +49,12 @@ define([
 
     function changeCurrentListener(playlist, track) {
         this.play(track);
+    }
+
+    function playInStream(player) {
+        return function(sound) {
+            return player.get('soundStream').playInStream(sound);
+        }
     }
 
     return Player;

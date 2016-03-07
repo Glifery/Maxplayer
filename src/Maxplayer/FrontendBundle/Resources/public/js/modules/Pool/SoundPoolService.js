@@ -1,11 +1,13 @@
 define([
     'Utils/CheckType',
     'Utils/Debug',
-    'Api/VkResourceService'
+    'Api/VkResourceService',
+    'Domain/Sound'
 ], function (
     CheckType,
     Debug,
-    VkResourceService
+    VkResourceService,
+    Sound
 ) {
     var SoundPoolServiceClass = SoundPoolService;
 
@@ -22,19 +24,31 @@ define([
                         track: track.get('name')
                     }
                 }
-            }
+            },
+            sound = track.get('sound')
         ;
+
+        if (sound) {
+            return Promise.resolve(sound);
+        }
 
         return new Promise(function(resolve, reject) {
             VkResourceService
                 .trackSound(request)
-                .then(function(responce) {
-                        track.set('sound', responce.data.sound);
+                .then(function(response) {
+                        var sound = null;
 
-                        resolve(track);
+                        if (response.status !== 'success') {
+                            reject(response);
+                        }
+
+                        sound = new Sound(response.data);
+                        track.set('sound', sound);
+
+                        resolve(sound);
                     },
-                    function(responce) {
-                        reject(responce);
+                    function(response) {
+                        reject(response);
                     }
                 )
             ;

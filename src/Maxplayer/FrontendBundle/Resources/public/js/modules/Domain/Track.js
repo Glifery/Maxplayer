@@ -9,9 +9,14 @@ define([
         defaults: {
             name: null,
             artist: null,
-            images: null
+            images: null,
+            sound: null
         },
-        domain: domain
+        domain: domain,
+
+        getSound: function() {
+
+        }
     });
 
     return Track;

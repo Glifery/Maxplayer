@@ -12,7 +12,7 @@ class InputOutputGate
     private $request;
 
     /** @var mixed */
-    private $responceData;
+    private $responseData;
 
     /** @var array */
     private $errors;
@@ -53,13 +53,13 @@ class InputOutputGate
      * @return InputOutputGate $this
      * @throws InputOutputException
      */
-    public function setResponceData($data)
+    public function setResponseData($data)
     {
-        if ($this->responceData) {
-            throw new InputOutputException('Trying to set Responce data in second time');
+        if ($this->responseData) {
+            throw new InputOutputException('Trying to set Response data in second time');
         }
 
-        $this->responceData = $data;
+        $this->responseData = $data;
 
         return $this;
     }
@@ -75,19 +75,19 @@ class InputOutputGate
         return $this;
     }
 
-    public function getResponce()
+    public function getResponse()
     {
-        if (!$this->responceData && !count($this->errors)) {
+        if (!$this->responseData && !count($this->errors)) {
             throw new InputOutputException('Trying to create Responce with neither data or errors');
         }
 
-        $responceArray = array(
+        $responseArray = array(
             'status' => count($this->errors) ? 'error' : 'success',
-            'data'   => $this->responceData,
+            'data'   => $this->responseData,
             'errors' => $this->errors
         );
-        $responce = new JsonResponse($responceArray);
+        $response = new JsonResponse($responseArray);
 
-        return $responce;
+        return $response;
     }
 }

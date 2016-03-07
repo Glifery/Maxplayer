@@ -4,6 +4,7 @@ namespace Maxplayer\RestBundle\Service;
 
 use Glifery\VkApiBundle\Api\VkApi;
 use Glifery\VkOAuthTokenBundle\Service\TokenManager;
+use Maxplayer\RestBundle\Model\Sound;
 use Maxplayer\RestBundle\Model\Track;
 
 class VkOperationHandler
@@ -58,8 +59,15 @@ class VkOperationHandler
             return $track;
         }
 
-        $url = $apiResponse->getResponse()[0]->url;
-        $track->setSound($url);
+        $soundArray = $apiResponse->getResponse()[0];
+
+        $sound = new Sound();
+        $sound->setArtist($soundArray->artist);
+        $sound->setTitle($soundArray->title);
+        $sound->setDuration($soundArray->duration);
+        $sound->setUrl($soundArray->url);
+
+        $track->setSound($sound);
 
         return $track;
     }

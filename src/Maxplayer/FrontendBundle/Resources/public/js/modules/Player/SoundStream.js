@@ -2,27 +2,57 @@ define([
     'Utils/CheckType',
     'Utils/Debug',
     'backbone',
-    'Utils/Soundmanager'
+    'Utils/SoundmanagerService'
 ], function(
     checkType,
     debug,
     Backbone,
-    Soundmanager
+    SoundmanagerService
 ){
     var SoundStream = Backbone.Model.extend({
         defaults: {
-            current: null,
-            status: null,
-            playlist: null,
-            soundStream: null
+            currentSound: null,
+            status: null
         },
 
-        playInStream: function(track) {
-            console.log('....play', track.get('name'));
+        initialize: function() {
+            var _this = this;
 
-            Soundmanager.createSound({
-                id: 'mySound',
-                url: track.get('sound'),
+            SoundmanagerService = SoundmanagerService.init(function() {
+                _this.set('status', true);
+            }, function() {
+                _this.set('status', false);
+            })
+        },
+
+        stopCurrent: function() {
+            var currentSound = this.get('currentSound');
+
+            if (!currentSound) {
+                return;
+            }
+
+            currentSound.get('stream')
+                .stop()
+                .destruct()
+            ;
+
+            currentSound.set({
+                stream: null,
+                loadStatus: false,
+                loadPosition: 0,
+                playStatus: false,
+                playPosition: 0
+            });
+
+            this.set('currentSound', null);
+        },
+
+        playInStream: function(sound) {
+            this.stopCurrent(this);
+
+            var stream = SoundmanagerService.createSound({
+                url: sound.get('url'),
                 autoLoad: true,
                 autoPlay: true,
                 onload: function() {
@@ -30,6 +60,13 @@ define([
                 },
                 volume: 50
             });
+
+            sound.set({
+                stream: stream,
+                loadStatus: true,
+                playStatus: true
+            });
+            this.set('currentSound', sound);
         }
     });
 

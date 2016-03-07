@@ -27,15 +27,15 @@ class TrackController extends Controller
         } catch (\Exception $e) {
             $inputOutputGate->addError($e->getMessage());
 
-            return $inputOutputGate->getResponce();
+            return $inputOutputGate->getResponse();
         }
 
         if (!$vkOperationHandler->fillTrackSound($track)) {
             $inputOutputGate->addError('Can\'t fill track sound');
         }
-        $inputOutputGate->setResponceData($track->toArray());
+        $inputOutputGate->setResponseData($track->getSound()->toArray());
 
-        return $inputOutputGate->getResponce();
+        return $inputOutputGate->getResponse();
     }
 
     /**
