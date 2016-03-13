@@ -16,9 +16,7 @@ define([
             duration: 0,
             url: null,
             stream: null,
-            loadStatus: null,
             loadPosition: 0,
-            playStatus: null,
             playPosition: 0
         }
     });

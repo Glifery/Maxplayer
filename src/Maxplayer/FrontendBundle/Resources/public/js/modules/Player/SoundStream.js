@@ -11,8 +11,8 @@ define([
 ){
     var SoundStream = Backbone.Model.extend({
         defaults: {
-            currentSound: null,
-            status: null
+            status: null,
+            currentSound: null
         },
 
         initialize: function() {
@@ -39,9 +39,7 @@ define([
 
             currentSound.set({
                 stream: null,
-                loadStatus: false,
                 loadPosition: 0,
-                playStatus: false,
                 playPosition: 0
             });
 
@@ -55,18 +53,27 @@ define([
                 url: sound.get('url'),
                 autoLoad: true,
                 autoPlay: true,
-                onload: function() {
-                    //alert('The sound '+this.id+' loaded!');
+                whileloading: function(qq,ww,ee,rr) {
+                    var loadPosition = this.bytesLoaded / this.bytesTotal;
+
+                    sound.set('loadPosition', loadPosition);
                 },
-                volume: 50
+                whileplaying: function(qq,ww,ee,rr) {
+                    var playPosition = Math.round(this.position / 1000);
+
+                    sound.set('playPosition', playPosition);
+                }
             });
 
             sound.set({
-                stream: stream,
-                loadStatus: true,
-                playStatus: true
+                stream: stream
             });
+
             this.set('currentSound', sound);
+        },
+
+        setVolume: function(volume) {
+            SoundmanagerService.setVolume(volume);
         }
     });
 

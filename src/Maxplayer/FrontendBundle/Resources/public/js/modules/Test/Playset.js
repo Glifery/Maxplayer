@@ -9,7 +9,8 @@ define([
     'Player/Playset',
     'Player/Playlist',
     'Player/Player',
-    'Player/SoundStream'
+    'Player/SoundStream',
+    'Utils/ModelEventService'
 ], function (
     App,
     Guesser,
@@ -19,7 +20,8 @@ define([
     Playset,
     Playlist,
     Player,
-    SoundStream
+    SoundStream,
+    ModelEventService
     ) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
@@ -31,6 +33,7 @@ define([
 
     $(function() {
         $('#container').append('<input type="text" class="js-input" value="">');
+        $('#container').append('<p class="js-player"></p>');
         $('#container').append('<div class="row"><ul class="col-md-6 js-playset"></ul><ul class="col-md-6 js-playlist"></ul></div>');
 
         playset.getCollection().on('update', function() {
@@ -64,6 +67,15 @@ define([
                 $('.js-playlist').append('<li style="color: blue;">'+track.get('name')+'</li>');
             });
         });
+
+        ModelEventService.on(player, 'currentTrack.sound', 'change', function(sound) {
+            //console.log('change!!', sound);
+            $('.js-player').html(sound.get('title') + ': (' + sound.get('loadPosition') + ') ' + sound.get('playPosition') + ' sec');
+        });
+
+        //player.on('update:currentTrack', function(currentTrack) {
+        //    console.log('cT', currentTrack);
+        //});
 
         guesser.on('change:track', function() {
             var loadedSongsAmount = 1;

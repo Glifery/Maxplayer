@@ -11,10 +11,10 @@ define([
 ){
     var Player = Backbone.Model.extend({
         defaults: {
-            current: null,
-            status: null,
             playlist: null,
-            soundStream: null
+            soundStream: null,
+            currentTrack: null,
+            volume: 50
         },
 
         initialize: function() {
@@ -27,11 +27,16 @@ define([
 
         play: function(track) {
             this.get('soundStream').stopCurrent();
+            this.set('currentTrack', track);
 
             return SoundPoolService
                 .fillSound(track)
                 .then(playInStream(this))
             ;
+        },
+
+        setVolume: function(volume) {
+            this.get('soundStream').setVolume(volume)
         }
     });
 
