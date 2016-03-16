@@ -22,7 +22,8 @@ define([
     var sound2 = new Sound({name: 'sound2'});
 
     console.log('CREATE', player1, track1, sound1);
-    ModelEventService.on(player1, 'currentTrack.sound', 'change:loadPosition', fnn, player1);
+    //ModelEventService.on(player1, 'currentTrack.sound', 'change:loadPosition', fnn, player1);
+    player1.chainOn('currentTrack.sound', 'change:loadPosition', fnn, player1);
 
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     console.log('++++ player0 -> currentTrack0 -> sound0 +++++++++++++++++++++++++++++++++');
@@ -31,7 +32,8 @@ define([
     player0 = new Player({name: 'player0', currentTrack: new Track({sound: sound0})});
     //console.log('GGGGGGG', player0.get('currentTrack'));
     sound0.set('loadPosition', 123);
-    ModelEventService.on(player0, 'currentTrack.sound', 'change:loadPosition', fnn, player1);
+    //ModelEventService.on(player0, 'currentTrack.sound', 'change:loadPosition', fnn, player1);
+    player0.chainOn('currentTrack.sound', 'change:loadPosition', fnn, player1);
     sound0.set('loadPosition', 321);
 
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
@@ -92,6 +94,11 @@ define([
     track2.set('sound', {});
     sound1.set('loadPosition', 51);
 
+    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+
+    console.log('\\\\\\\\\\\\\\\\\\\\', player1);
+    console.log('\\\\\\\\\\\\\\\\\\\\', track1);
+    console.log('\\\\\\\\\\\\\\\\\\\\', sound1);
 
     function fnn(model, attribute) {
         console.log('!!!!!!!! SUCCESS', attribute);

@@ -9,11 +9,11 @@ define([
     _,
     Backbone
 ){
-    var ModelEventServiceClass = ModelEventService;
+    //var ModelEventServiceClass = ModelEventService;
 
-    ModelEventServiceClass.prototype.on = _on;
+    //ModelEventServiceClass.prototype.on = _on;
 
-    function ModelEventService() {};
+    //function ModelEventService() {};
 
     //ModelEventService.on(player, 'currentTrack.sound', 'change', fn, player);
     function _on(origin, attributesChain, event, callback, context) {
@@ -123,5 +123,13 @@ define([
         }
     }
 
-    return new ModelEventService();
+    _.extend(Backbone.Model.prototype, {
+        chainOn: function(attributesChain, event, callback, context) {
+            _on(this, attributesChain, event, callback, context);
+
+            return this;
+        }
+    });
+
+    //return new ModelEventService();
 });

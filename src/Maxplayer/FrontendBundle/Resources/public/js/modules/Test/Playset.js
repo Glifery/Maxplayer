@@ -68,7 +68,7 @@ define([
             });
         });
 
-        ModelEventService.on(player, 'currentTrack.sound', 'change', function(sound) {
+        player.chainOn('currentTrack.sound', 'change', function(sound) {
             //console.log('change!!', sound);
             $('.js-player').html(sound.get('title') + ': (' + sound.get('loadPosition') + ') ' + sound.get('playPosition') + ' sec');
         });
