@@ -22,18 +22,17 @@ define([
     var sound2 = new Sound({name: 'sound2'});
     console.log('CREATE', player1, track1, sound1);
 
-    //_debug(player1);
+    _debug(player1);
     player1.chainOn('currentTrack.sound', 'change:loadPosition', fnn, player1);
 
 
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     console.log('1+++ player0 -> currentTrack0 -> sound0 ++++++++++++++++++++++++++++++321');
 
-    sound0 = new Sound();
-    player0 = new Player({name: 'player0', currentTrack: new Track({sound: sound0})});
-    //console.log('GGGGGGG', player0.get('currentTrack'));
+    sound0 = new Sound({name: 'sound0'});
+    player0 = new Player({name: 'player0', currentTrack: new Track({name: 'track0', sound: sound0})});
+    _debug(player0);
     sound0.set('loadPosition', 123);
-    //ModelEventService.on(player0, 'currentTrack.sound', 'change:loadPosition', fnn, player1);
     player0.chainOn('currentTrack.sound', 'change:loadPosition', fnn, player1);
     sound0.set('loadPosition', 321);
 
@@ -110,12 +109,18 @@ define([
 
     function fnn(model, attribute) {
         console.log('!!!!!!!! SUCCESS', attribute, this.get('name'));
-        //console.log('!!!!!!!! FINAL', model, attribute, this);
     }
 
     function _debug(player) {
         player.on('chain:traverse:on', function(data) {
-            console.warn(data.event, data.model.get('name'), '-->', data.attribute);
+            console.warn(
+                data.event,
+                data.model.get('name'),
+                '-->',
+                data.attribute,
+                '{',
+                data.model.get(data.attribute) instanceof Backbone.Model ? data.model.get(data.attribute).get('name') : typeof data.model.get(data.attribute)
+            );
         });
         player.on('chain:traverse:off', function(data) {
             console.info(

@@ -1,20 +1,10 @@
 define([
-    'Utils/CheckType',
-    'Utils/Debug',
     'underscore',
     'backbone'
 ], function(
-    checkType,
-    debug,
     _,
     Backbone
 ){
-    //var ModelEventServiceClass = ModelEventService;
-
-    //ModelEventServiceClass.prototype.on = _on;
-
-    //function ModelEventService() {};
-
     function _createContext(origin, chain, event, callback, contextOrNull) {
         var context = contextOrNull ? contextOrNull : origin;
 
@@ -34,74 +24,44 @@ define([
         }
     }
 
-    //ModelEventService.on(player, 'currentTrack.sound', 'change', fn, player);
     function _on(origin, chain, event, callback, context) {
         var attributes = chain.split('.'),
-            nextAttributeName = null,
             context = _createContext(origin, chain, event, callback, context)
         ;
 
-        if (!attributes.length) {
-            _endEventOn(context)(origin);
-
-            return;
-        }
-        //_recursiveSetEndEvent(origin, attributes, _endEventOn(context));
-
-        nextAttributeName = attributes.shift();
-        origin.on('change:' + nextAttributeName, _recursiveSetTraverse(nextAttributeName, attributes, context), context);
-        _triggerTraverseOn(origin, nextAttributeName, attributes, context);
+        _recursiveSetTraverse(origin, attributes, context);
+        _recursiveChangeEndEvent(origin, attributes, _endEventOn(context));
 
         _triggerOn(context);
     }
 
-    //'currentTrack', [sound]
-    //'sound', []
-    function _recursiveSetTraverse(attributeName, originAttributes, context) {
-        var clonedAttributes = _.clone(originAttributes);
+    function _recursiveSetTraverse(model, originAttributes, context) {
+        var attributes = _.clone(originAttributes),
+            attributeName = attributes.shift()
+        ;
 
-        //change:currentTrack (player, currentTrack)
-        //change:sound (currentTrack, sound)
-        return function (parentModel, attributeModel) {
-            var attributes = _.clone(clonedAttributes),
-                pleviousModel = parentModel.previous(attributeName),
-                nextAttributeName = null
-            ;
+        if (!attributeName) {
+            return;
+        }
+
+        var handler = function(parentModel, attributeModel) {
+            var pleviousModel = parentModel.previous(attributeName);
+
+            if (_checkBackboneModel(pleviousModel)) {
+                _recursiveUnsetTraverse(pleviousModel, attributes, context);
+                _recursiveChangeEndEvent(pleviousModel, attributes, _endEventOff(context));
+            }
+
+            if (_checkBackboneModel(attributeModel)) {
+                _recursiveSetTraverse(attributeModel, attributes, context);
+                _recursiveChangeEndEvent(attributeModel, attributes, _endEventOn(context));
+            }
 
             _triggerTraverseFire(parentModel, attributeName, attributeModel, pleviousModel, attributes, context);
+        };
 
-            if (!attributes.length) {
-                if (pleviousModel && (pleviousModel instanceof Backbone.Model)) {
-                    _endEventOff(context)(pleviousModel);
-                }
-
-                if (attributeModel instanceof Backbone.Model) {
-                    _endEventOn(context)(attributeModel);
-                }
-
-                return;
-            }
-
-            if (pleviousModel && (pleviousModel instanceof Backbone.Model)) {
-                _recursiveUnsetTraverse(pleviousModel, attributes, context);
-                //***********************************************************************
-                if (!attributes.length) {
-                    _endEventOff(context)(pleviousModel);
-                }
-            }
-
-            if (attributeModel instanceof Backbone.Model) {
-                if (!attributes.length) {
-                    _endEventOn(context)(attributeModel);
-                }
-
-                _recursiveSetEndEvent(attributeModel, attributes, _endEventOn(context));
-
-                nextAttributeName = attributes.shift();
-                attributeModel.on('change:' + nextAttributeName, _recursiveSetTraverse(nextAttributeName, attributes, context), context);
-                _triggerTraverseOn(attributeModel, nextAttributeName, attributes, context);
-            }
-        }
+        model.on('change:' + attributeName, handler, context);
+        _triggerTraverseOn(model, attributeName, attributes, context);
     }
 
     function _recursiveUnsetTraverse(model, originAttributes, context) {
@@ -110,7 +70,7 @@ define([
             nextModel = null;
         ;
 
-        if(!(model instanceof Backbone.Model)) {
+        if (!nextAttributeName) {
             return;
         }
 
@@ -118,46 +78,33 @@ define([
         _triggerTraverseOff(model, nextAttributeName, attributes, context);
 
         nextModel = model.get(nextAttributeName);
-        if (!(nextModel && (nextModel instanceof Backbone.Model))) {
-            return;
+        if (_checkBackboneModel(nextModel)) {
+            _recursiveUnsetTraverse(nextModel, attributes, context)
         }
 
-        if (!attributes.length) {
-            _endEventOff(context)(nextModel);
-
-            return;
-        }
-
-        _recursiveUnsetTraverse(nextModel, attributes, context)
     }
 
-    //player, [currentTrack, sound]'
-    //currentTrack, [sound]'
-    function _recursiveSetEndEvent(model, originAttributes, endEventFunction) {
+    function _recursiveChangeEndEvent(model, originAttributes, endEventFunction) {
         var attributes = _.clone(originAttributes),
             nextAttributeName = attributes.shift(),
             nextModel = null
         ;
 
+        if (!nextAttributeName) {
+            endEventFunction(model);
+
+            return;
+        }
+
         nextModel = model.get(nextAttributeName);
-        if (!(nextModel && (nextModel instanceof Backbone.Model))) {
-            return;
+        if (_checkBackboneModel(nextModel)) {
+            _recursiveChangeEndEvent(nextModel, attributes, endEventFunction);
         }
-
-        if (!attributes.length) {
-            endEventFunction(nextModel);
-
-            return;
-        }
-
-        _recursiveSetEndEvent(nextModel, attributes, endEventFunction);
     }
 
     function _endEventOn(context) {
         return function(endModel) {
-            endModel.off(context.event, null, context);
             endModel.on(context.event, context.callbackInContext, context);
-
             _triggerEndEventOn(endModel, context);
         }
     }
@@ -165,9 +112,16 @@ define([
     function _endEventOff(context) {
         return function(endModel) {
             endModel.off(context.event, null, context);
-
             _triggerEndEventOff(endModel, context);
         }
+    }
+
+    function _checkBackboneModel(model) {
+        if ((typeof model === 'object') && (model instanceof Backbone.Model)) {
+            return true;
+        }
+
+        return false;
     }
 
     function _triggerOn(context) {
@@ -247,6 +201,4 @@ define([
             return this;
         }
     });
-
-    //return new ModelEventService();
 });
