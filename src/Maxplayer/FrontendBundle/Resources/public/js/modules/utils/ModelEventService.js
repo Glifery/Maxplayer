@@ -24,15 +24,71 @@ define([
         }
     }
 
+    function _registerChainEvent(model, context) {
+        model._chainEvents = model._chainEvents || {};
+        model._chainEvents[context.chain] = model._chainEvents[context.chain] || {};
+        model._chainEvents[context.chain][context.event] = model._chainEvents[context.chain][context.event] || [];
+        model._chainEvents[context.chain][context.event].push(context);
+
+        _triggerOn(context);
+    }
+
     function _on(origin, chain, event, callback, context) {
-        var attributes = chain.split('.'),
-            context = _createContext(origin, chain, event, callback, context)
+        var context = _createContext(origin, chain, event, callback, context),
+            attributes = chain.split('.')
         ;
 
         _recursiveSetTraverse(origin, attributes, context);
         _recursiveChangeEndEvent(origin, attributes, _endEventOn(context));
+        _registerChainEvent(origin, context);
+    }
 
-        _triggerOn(context);
+    function _off(origin, chain, event, context) {
+        if (!origin.hasOwnProperty('_chainEvents')) {
+            return;
+        }
+
+        for (var chainVariant in origin._chainEvents) {
+            for (var eventVariant in origin._chainEvents[chainVariant]) {
+                origin._chainEvents[chainVariant][eventVariant] = _.filter(
+                    origin._chainEvents[chainVariant][eventVariant],
+                    function(contextVariant){
+                        if (chain && (chainVariant !== chain)) {
+                            return true;
+                        }
+
+                        if (event && (eventVariant !== event)) {
+                            return true;
+                        }
+
+                        if (context && (contextVariant.context !== context)) {
+                            return true;
+                        }
+
+                        _doOff(contextVariant);
+
+                        return false;
+                    }
+                );
+            }
+
+            if (_.isEmpty(origin._chainEvents[chainVariant][eventVariant])) {
+                origin._chainEvents[chainVariant] = _.omit(origin._chainEvents[chainVariant], eventVariant);
+            }
+        }
+
+        if (_.isEmpty(origin._chainEvents[chainVariant])) {
+            origin._chainEvents = _.omit(origin._chainEvents, chainVariant);
+        }
+    }
+
+    function _doOff(context) {
+        var attributes = context.chain.split('.');
+
+        _recursiveUnsetTraverse(context.origin, attributes, context);
+        _recursiveChangeEndEvent(context.origin, attributes, _endEventOff(context));
+
+        _triggerOff(context);
     }
 
     function _recursiveSetTraverse(model, originAttributes, context) {
@@ -127,6 +183,7 @@ define([
     function _triggerOn(context) {
         context.origin.trigger('chain:on chain', {
             event: 'chain:on',
+            model: context.origin,
             context: context
         });
     }
@@ -134,6 +191,7 @@ define([
     function _triggerOff(context) {
         context.origin.trigger('chain:off chain', {
             event: 'chain:off',
+            model: context.origin,
             context: context
         });
     }
@@ -197,6 +255,11 @@ define([
     _.extend(Backbone.Model.prototype, {
         chainOn: function(attributesChain, event, callback, context) {
             _on(this, attributesChain, event, callback, context);
+
+            return this;
+        },
+        chainOff: function(attributesChain, event, context) {
+            _off(this, attributesChain, event, context);
 
             return this;
         }

@@ -25,13 +25,12 @@ define([
     _debug(player1);
     player1.chainOn('currentTrack.sound', 'change:loadPosition', fnn, player1);
 
-
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
     console.log('1+++ player0 -> currentTrack0 -> sound0 ++++++++++++++++++++++++++++++321');
 
     sound0 = new Sound({name: 'sound0'});
     player0 = new Player({name: 'player0', currentTrack: new Track({name: 'track0', sound: sound0})});
-    _debug(player0);
+    //_debug(player0);
     sound0.set('loadPosition', 123);
     player0.chainOn('currentTrack.sound', 'change:loadPosition', fnn, player1);
     sound0.set('loadPosition', 321);
@@ -100,6 +99,16 @@ define([
     track2.set('sound', sound1);
     track1.set('sound', {});
     sound1.set('loadPosition', 61);
+
+    console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+    console.log('12++ chainOn x2 ++++ chainOn -1 ++++++++++++++++++++++++++++++1-1|2-2-2|3');
+
+    player1.chainOn('currentTrack.sound', 'change:loadPosition', fnn, player1);
+    sound1.set('loadPosition', 711);
+    player1.chainOn('currentTrack.sound', 'change:loadPosition', fnn, sound1);
+    sound1.set('loadPosition', 712);
+    player1.chainOff(null, null, player1);
+    sound1.set('loadPosition', 713);
 
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
