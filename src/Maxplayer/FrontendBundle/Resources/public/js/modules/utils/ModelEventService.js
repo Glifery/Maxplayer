@@ -15,112 +15,229 @@ define([
 
     //function ModelEventService() {};
 
-    //ModelEventService.on(player, 'currentTrack.sound', 'change', fn, player);
-    function _on(origin, attributesChain, event, callback, context) {
-        console.log('!.', '_START chain \'' + attributesChain + '\' event \'' + event + '\'');
-        var attributes = attributesChain.split('.');
+    function _createContext(origin, chain, event, callback, contextOrNull) {
+        var context = contextOrNull ? contextOrNull : origin;
 
-        if (!context) {
-            context = origin;
+        return {
+            origin: origin,
+            chain: chain,
+            event: event,
+            callback: callback,
+            callbackInContext: function() {
+                var args = arguments;
+
+                callback.apply(context, args);
+
+                _triggerEndEventFire(args, this);
+            },
+            context: context
         }
+    }
 
-        _recursiveSet(origin, attributes, _onEndEvent(event, callback, context));
+    //ModelEventService.on(player, 'currentTrack.sound', 'change', fn, player);
+    function _on(origin, chain, event, callback, context) {
+        var attributes = chain.split('.'),
+            nextAttributeName = null,
+            context = _createContext(origin, chain, event, callback, context)
+        ;
 
-        var nextAttributeName = attributes.shift();
+        if (!attributes.length) {
+            _endEventOn(context)(origin);
 
-        var level = '....';
-        console.log('!.', '_FIRST for \'change:' + nextAttributeName + '\' events', attributes);
-        origin.on('change:' + nextAttributeName, _recursiveChange(nextAttributeName, attributes, event, callback, level), context);
+            return;
+        }
+        //_recursiveSetEndEvent(origin, attributes, _endEventOn(context));
+
+        nextAttributeName = attributes.shift();
+        origin.on('change:' + nextAttributeName, _recursiveSetTraverse(nextAttributeName, attributes, context), context);
+        _triggerTraverseOn(origin, nextAttributeName, attributes, context);
+
+        _triggerOn(context);
     }
 
     //'currentTrack', [sound]
     //'sound', []
-    function _recursiveChange(attributeName, originAttributes, event, callback, level) {
+    function _recursiveSetTraverse(attributeName, originAttributes, context) {
         var clonedAttributes = _.clone(originAttributes);
-        console.log(level, '_recursiveChange for \'change:' + attributeName + '\' attributes', clonedAttributes);
 
         //change:currentTrack (player, currentTrack)
         //change:sound (currentTrack, sound)
-        return function (origin, attributeModel) {
+        return function (parentModel, attributeModel) {
             var attributes = _.clone(clonedAttributes),
-                pleviousModel = null,
-                nextAttributeName = null,
-                context = this
+                pleviousModel = parentModel.previous(attributeName),
+                nextAttributeName = null
             ;
 
+            _triggerTraverseFire(parentModel, attributeName, attributeModel, pleviousModel, attributes, context);
+
             if (!attributes.length) {
-                if ((pleviousModel = origin.previous(attributeName)) && (pleviousModel instanceof Backbone.Model)) {
-                    console.log(level, '_OFF \'' + attributeName + '\' event', event);
-                    pleviousModel.off(event, null, context);
+                if (pleviousModel && (pleviousModel instanceof Backbone.Model)) {
+                    _endEventOff(context)(pleviousModel);
                 }
 
                 if (attributeModel instanceof Backbone.Model) {
-                    console.log(level, '_ON \'' + attributeName + '\' event', event);
-                    attributeModel.off(event, null, context);
-                    attributeModel.on(event, callback, context);
+                    _endEventOn(context)(attributeModel);
                 }
 
                 return;
             }
 
-            if ((pleviousModel = origin.previous(attributeName)) && (pleviousModel instanceof Backbone.Model)) {
-                _recursiveSet(pleviousModel, attributes, _offEndEvent(event, context));
-
-                console.log(level, '_off CHANGE \'' + attributeName + '\' attributes', attributes);
-                pleviousModel.off('change:' + nextAttributeName, null, context);
+            if (pleviousModel && (pleviousModel instanceof Backbone.Model)) {
+                _recursiveUnsetTraverse(pleviousModel, attributes, context);
+                //***********************************************************************
+                if (!attributes.length) {
+                    _endEventOff(context)(pleviousModel);
+                }
             }
 
-            if (!(attributeModel instanceof Backbone.Model)) {
-                return;
+            if (attributeModel instanceof Backbone.Model) {
+                if (!attributes.length) {
+                    _endEventOn(context)(attributeModel);
+                }
+
+                _recursiveSetEndEvent(attributeModel, attributes, _endEventOn(context));
+
+                nextAttributeName = attributes.shift();
+                attributeModel.on('change:' + nextAttributeName, _recursiveSetTraverse(nextAttributeName, attributes, context), context);
+                _triggerTraverseOn(attributeModel, nextAttributeName, attributes, context);
             }
-
-            _recursiveSet(attributeModel, attributes, _onEndEvent(event, callback, context));
-
-            nextAttributeName = attributes.shift();
-            console.log(level, '_set CHANGE for ' + attributeName + '\'change:' + nextAttributeName + '\' attributes', attributes);
-            level += '..';
-            attributeModel.on('change:' + nextAttributeName, _recursiveChange(nextAttributeName, attributes, event, callback, level), context);
         }
+    }
+
+    function _recursiveUnsetTraverse(model, originAttributes, context) {
+        var attributes = _.clone(originAttributes),
+            nextAttributeName = attributes.shift(),
+            nextModel = null;
+        ;
+
+        if(!(model instanceof Backbone.Model)) {
+            return;
+        }
+
+        model.off('change:' + nextAttributeName, null, context);
+        _triggerTraverseOff(model, nextAttributeName, attributes, context);
+
+        nextModel = model.get(nextAttributeName);
+        if (!(nextModel && (nextModel instanceof Backbone.Model))) {
+            return;
+        }
+
+        if (!attributes.length) {
+            _endEventOff(context)(nextModel);
+
+            return;
+        }
+
+        _recursiveUnsetTraverse(nextModel, attributes, context)
     }
 
     //player, [currentTrack, sound]'
     //currentTrack, [sound]'
-    function _recursiveSet(model, originAttributes, setFunction) {
+    function _recursiveSetEndEvent(model, originAttributes, endEventFunction) {
         var attributes = _.clone(originAttributes),
             nextAttributeName = attributes.shift(),
             nextModel = null
         ;
 
         nextModel = model.get(nextAttributeName);
-        if ((!nextModel) || (!(nextModel instanceof Backbone.Model))) {
+        if (!(nextModel && (nextModel instanceof Backbone.Model))) {
             return;
         }
 
         if (!attributes.length) {
-            if (typeof setFunction === 'function') {
-                setFunction(nextModel);
-            }
+            endEventFunction(nextModel);
 
             return;
         }
 
-        console.log('... _recursiveSet DEEP from \'' + nextAttributeName + '\' to', attributes);
-        _recursiveSet(nextModel, attributes, setFunction);
+        _recursiveSetEndEvent(nextModel, attributes, endEventFunction);
     }
 
-    function _onEndEvent(event, callback, context) {
+    function _endEventOn(context) {
         return function(endModel) {
-            console.log('... _recursiveSet ON to');
-            endModel.off(event, null, context);
-            endModel.on(event, callback, context);
+            endModel.off(context.event, null, context);
+            endModel.on(context.event, context.callbackInContext, context);
+
+            _triggerEndEventOn(endModel, context);
         }
     }
 
-    function _offEndEvent(event, context) {
+    function _endEventOff(context) {
         return function(endModel) {
-            console.log('... _recursiveSet OFF to');
-            endModel.off(event, null, context);
+            endModel.off(context.event, null, context);
+
+            _triggerEndEventOff(endModel, context);
         }
+    }
+
+    function _triggerOn(context) {
+        context.origin.trigger('chain:on chain', {
+            event: 'chain:on',
+            context: context
+        });
+    }
+
+    function _triggerOff(context) {
+        context.origin.trigger('chain:off chain', {
+            event: 'chain:off',
+            context: context
+        });
+    }
+
+    function _triggerTraverseOn(model, attributeName, attributes, context) {
+        context.origin.trigger('chain:traverse:on chain:traverse chain', {
+            event: 'chain:traverse:on',
+            model: model,
+            attribute: attributeName,
+            attributes: attributes,
+            context: context
+        });
+    }
+
+    function _triggerTraverseOff(model, attributeName, attributes, context) {
+        context.origin.trigger('chain:traverse:off chain:traverse chain', {
+            event: 'chain:traverse:off',
+            model: model,
+            attribute: attributeName,
+            attributes: attributes,
+            context: context
+        });
+    }
+
+    function _triggerTraverseFire(model, attributeName, attributeModel, pleviousModel, attributes, context) {
+        context.origin.trigger('chain:traverse:fire chain:traverse chain', {
+            event: 'chain:traverse:fire',
+            model: model,
+            attribute: attributeName,
+            previous: pleviousModel,
+            value: attributeModel,
+            attributes: attributes,
+            context: context
+        });
+    }
+
+    function _triggerEndEventOn(model, context) {
+        context.origin.trigger('chain:end_event:on chain:end_event chain', {
+            event: 'chain:end_event:on',
+            model: model,
+            context: context
+        });
+    }
+
+    function _triggerEndEventOff(model, context) {
+        context.origin.trigger('chain:end_event:off chain:end_event chain', {
+            event: 'chain:end_event:off',
+            model: model,
+            context: context
+        });
+    }
+
+    function _triggerEndEventFire(data, context) {
+        context.origin.trigger('chain:end_event:fire chain:end_event chain', {
+            event: 'chain:end_event:fire',
+            data: data,
+            context: context
+        });
     }
 
     _.extend(Backbone.Model.prototype, {
