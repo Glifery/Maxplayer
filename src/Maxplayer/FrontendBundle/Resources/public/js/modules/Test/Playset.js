@@ -9,8 +9,7 @@ define([
     'Player/Playset',
     'Player/Playlist',
     'Player/Player',
-    'Player/SoundStream',
-    'Utils/ModelEventService'
+    'Player/SoundStream'
 ], function (
     App,
     Guesser,
@@ -20,8 +19,7 @@ define([
     Playset,
     Playlist,
     Player,
-    SoundStream,
-    ModelEventService
+    SoundStream
 ) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
