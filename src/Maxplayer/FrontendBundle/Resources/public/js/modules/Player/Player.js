@@ -8,7 +8,7 @@ define([
     debug,
     Backbone,
     SoundPoolService
-){
+    ){
     var Player = Backbone.Model.extend({
         defaults: {
             playlist: null,
@@ -18,20 +18,22 @@ define([
         },
 
         initialize: function() {
-            this.on('change:playlist', changePlaylistListener);
-
-            if (this.get('playlist')) {
-                changePlaylistListener(this, this.get('playlist'));
-            }
+            this.chainOn('playlist', 'change:current', function(playlist, track) {
+                this.play(track);
+            }, this)
         },
 
         play: function(track) {
+            var _this = this;
+
             this.get('soundStream').stopCurrent();
             this.set('currentTrack', track);
 
             return SoundPoolService
                 .fillSound(track)
-                .then(playInStream(this))
+                .then(function(sound) {
+                    _this.get('soundStream').playInStream(sound);
+                })
             ;
         },
 
@@ -39,28 +41,6 @@ define([
             this.get('soundStream').setVolume(volume)
         }
     });
-
-    function changePlaylistListener(player, playlist) {
-        var pleviousPlaylist = null;
-
-        if (pleviousPlaylist = player.previous('playlist')) {
-            pleviousPlaylist.off('change:current', changeCurrentListener);
-        }
-
-        if (playlist) {
-            playlist.on('change:current', changeCurrentListener, player)
-        }
-    }
-
-    function changeCurrentListener(playlist, track) {
-        this.play(track);
-    }
-
-    function playInStream(player) {
-        return function(sound) {
-            return player.get('soundStream').playInStream(sound);
-        }
-    }
 
     return Player;
 });

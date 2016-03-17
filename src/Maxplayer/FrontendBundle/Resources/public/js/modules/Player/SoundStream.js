@@ -65,9 +65,7 @@ define([
                 }
             });
 
-            sound.set({
-                stream: stream
-            });
+            sound.set('stream', stream);
 
             this.set('currentSound', sound);
         },

@@ -22,7 +22,7 @@ define([
     Player,
     SoundStream,
     ModelEventService
-    ) {
+) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
 
     var guesser = new Guesser;
@@ -34,6 +34,7 @@ define([
     $(function() {
         $('#container').append('<input type="text" class="js-input" value="">');
         $('#container').append('<p class="js-player"></p>');
+        $('#container').append('<button class="js-button-next">Next</button>');
         $('#container').append('<div class="row"><ul class="col-md-6 js-playset"></ul><ul class="col-md-6 js-playlist"></ul></div>');
 
         playset.getCollection().on('update', function() {
@@ -78,7 +79,7 @@ define([
         //});
 
         guesser.on('change:track', function() {
-            var loadedSongsAmount = 1;
+            var loadedSongsAmount = 3;
 
             this.get('track').each(function(element) {
                 var track = element.get('domain');
@@ -90,24 +91,24 @@ define([
                 playset.add(track);
             });
 
-            playlist.gotoNextTrack()
-                .then(function(next) {
-                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
-
-                    //playlist.loadNextTrack();
-                    //return playlist.gotoNextTrack();
-                })
-                //.then(function(next) {
-                //    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
-                //
-                //    return playlist.gotoNextTrack();
-                //})
-                //.then(function(next) {
-                //    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
-                //
-                //    playlist.loadNextTrack();
-                //})
-            ;
+            //playlist.gotoNextTrack()
+            //    .then(function(next) {
+            //        console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
+            //
+            //        //playlist.loadNextTrack();
+            //        //return playlist.gotoNextTrack();
+            //    })
+            //    //.then(function(next) {
+            //    //    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
+            //    //
+            //    //    return playlist.gotoNextTrack();
+            //    //})
+            //    //.then(function(next) {
+            //    //    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
+            //    //
+            //    //    playlist.loadNextTrack();
+            //    //})
+            //;
         });
 
         $('.js-input').on('keyup', function() {
@@ -115,5 +116,15 @@ define([
 
             guesser.set('query', query);
         });
+
+        $('.js-button-next').on('click', function() {
+            playlist.gotoNextTrack()
+                .then(function(next) {
+                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', playlist.get('prevCollection').size(), playlist.get('nextCollection').size())
+
+                    return playlist.loadNextTrack();
+                })
+            ;
+        })
     });
 });
