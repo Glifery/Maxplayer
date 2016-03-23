@@ -41,6 +41,19 @@ define([
 
         return this._promise_getSimilar
     };
+    Track.prototype.getArtist = function() {
+        if (!this._promise_getArtist) {
+            if (this._relation_artist) {
+                this._promise_getArtist = Promise.resolve(this._relation_artist);
+                console.log('resolve!!!');
+            } else {
+                this._promise_getArtist = ArtistPoolService.trackGetArtist(this);
+                console.log('new...');
+            }
+        }
+
+        return this._promise_getArtist
+    };
 
     //Track.prototype.similar = function() {
     //    return TrackPoolService.getSimilar(this);

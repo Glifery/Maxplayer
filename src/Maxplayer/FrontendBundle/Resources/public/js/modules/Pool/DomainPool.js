@@ -10,9 +10,10 @@ define([
     Collection
 ) {
     var DomainPoolClass = DomainPool;
-    DomainPoolClass.prototype.pool = {};
+    DomainPoolClass.prototype.pool = {'artist': {}, 'album': {}, 'track': {}, 'tag': {}};
     DomainPoolClass.prototype.createRequestByDomain = _createRequestByDomain;
     DomainPoolClass.prototype.populateCollection = _populateCollection;
+    DomainPoolClass.prototype.findOrCreate = _findOrCreate;
 
     function DomainPool() {}
 
@@ -34,7 +35,7 @@ define([
         ;
 
         _.each(responseElements, function(item) {
-            var domain = _findOrCreate.call(_this, item),
+            var domain = _this.findOrCreate(item),
                 sort = (typeof sortCallback === 'function') ? parseFloat(sortCallback(item)) : null;
             ;
 
@@ -44,13 +45,15 @@ define([
         return collection;
     }
 
-    function _findOrCreate(info) {
-        if (info.hasOwnProperty('mbid') && this.pool.hasOwnProperty(info.mbid)) {
-            return this.pool[info.mbid];
+    function _findOrCreate(info, anotherDomainCode) {
+        var domainCode = anotherDomainCode ? anotherDomainCode : this.domainCode;
+
+        if (info.hasOwnProperty('mbid') && this.pool[domainCode].hasOwnProperty(info.mbid)) {
+            return this.pool[domainCode][info.mbid];
         }
 
-        if (info.hasOwnProperty('name') && this.pool.hasOwnProperty(info.name)) {
-            return this.pool[info.name];
+        if (info.hasOwnProperty('name') && this.pool[domainCode].hasOwnProperty(info.name)) {
+            return this.pool[domainCode][info.name];
         }
 
         var domain = this.createNewDomain();
@@ -62,7 +65,10 @@ define([
             domain.set('name', info.name);
         }
         if (info.hasOwnProperty('artist')) {
-            domain.set('artist', info.artist);
+            var artistInfo = (typeof info.artist === 'object') ? info.artist : {'name': info.artist};
+
+            domain._relation_artist = this.findOrCreate(artistInfo, 'artist');
+            domain.set('artist', domain._relation_artist.get('name'));
         }
         if (info.hasOwnProperty('id')) {
             domain.set('id', info.id);
@@ -71,10 +77,17 @@ define([
             domain.set('images', _normalizeImages(info.image));
         }
 
+        if (info.hasOwnProperty('mbid')) {
+            this.pool[domainCode][info.mbid] = domain;
+        }
+        if (info.hasOwnProperty('name')) {
+            this.pool[domainCode][info.name] = domain;
+        }
+
         return domain;
     }
 
-    function _normalizeImages(imagesInfo, domain) {
+    function _normalizeImages(imagesInfo) {
         var images = {};
 
         for (var index in imagesInfo) {

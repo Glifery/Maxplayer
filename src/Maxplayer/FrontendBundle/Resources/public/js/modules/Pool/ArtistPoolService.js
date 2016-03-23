@@ -4,22 +4,22 @@ define([
     'underscore',
     'Pool/DomainPool',
     'Api/LastFmResourceService',
-    'Domain/Artist',
-    'Domain/Collection'
+    'Domain/Artist'
 ], function (
     CheckType,
     Debug,
     _,
     DomainPool,
     LastFmResourceService,
-    Artist,
-    Collection
+    Artist
 ) {
     var ArtistPoolServiceClass = ArtistPoolService;
     ArtistPoolServiceClass.prototype = new DomainPool;
     ArtistPoolServiceClass.prototype.createNewDomain = _createNewDomain;
+    ArtistPoolServiceClass.prototype.domainCode = 'artist';
 
     ArtistPoolServiceClass.prototype.artistGetSimilar = _artistGetSimilar;
+    ArtistPoolServiceClass.prototype.trackGetArtist = _trackGetArtist;
     ArtistPoolServiceClass.prototype.search = _search;
 
     function ArtistPoolService() {}
@@ -36,6 +36,25 @@ define([
                 },
                 function(response) {
                     console.log('REJECT artistGetSimilar()', response);
+                }
+            )
+        ;
+    }
+
+    function _trackGetArtist(track) {
+        var _this = this,
+            request = {'artist': track.get('artist')}
+        ;
+
+        return LastFmResourceService
+            .artistGetInfo(request)
+            .then(function(response) {
+                    var artist = _this.findOrCreate(response.artist);
+
+                    return artist;
+                },
+                function(response) {
+                    console.log('REJECT artistGetInfo()', response);
                 }
             )
         ;

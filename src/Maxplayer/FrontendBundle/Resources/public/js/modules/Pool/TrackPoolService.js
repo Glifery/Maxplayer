@@ -4,20 +4,19 @@ define([
     'underscore',
     'Pool/DomainPool',
     'Api/LastFmResourceService',
-    'Domain/Track',
-    'Domain/Collection'
+    'Domain/Track'
 ], function (
     CheckType,
     Debug,
     _,
     DomainPool,
     LastFmResourceService,
-    Track,
-    Collection
+    Track
 ) {
     var TrackPoolServiceClass = TrackPoolService;
     TrackPoolServiceClass.prototype = new DomainPool;
     TrackPoolServiceClass.prototype.createNewDomain = _createNewDomain;
+    TrackPoolServiceClass.prototype.domainCode = 'track';
 
     TrackPoolServiceClass.prototype.trackGetSimilar = _trackGetSimilar;
     TrackPoolServiceClass.prototype.artistGetTopTracks = _artistGetTopTracks;

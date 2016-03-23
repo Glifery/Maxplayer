@@ -29,6 +29,12 @@ define([
                 limit: 5
             }
         })
+        .addRoute('artistGetInfo', {
+            params: {
+                method: 'artist.getInfo',
+                autocorrect: 1
+            }
+        })
         .addRoute('artistGetSimilar', {
             params: {
                 method: 'artist.getSimilar',

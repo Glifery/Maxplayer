@@ -21,18 +21,24 @@ define([
             console.log('DONE!!!', domains[3].get('name'));
 
             return domains[3].getTopTracks();
-            //return domains[3].getSimilar();
         })
         .then(function(collection) {
-            console.log('collection', collection);
+            console.log('tracks collection', collection);
             var domains = collection.getDomains();
 
             console.log('DONE!!!', domains[3].get('name'));
 
-            return domains[3].getSimilar();
+            return domains[3].getArtist();
+        })
+        .then(function(anotherArtist) {
+            console.log('anotherArtist', anotherArtist);
+
+            console.log('DONE!!!', anotherArtist.get('name'));
+
+            return anotherArtist.getTopTracks();
         })
         .then(function(collection) {
-            console.log('collection', collection);
+            console.log('collection or artist', collection);
             var domains = collection.getDomains();
 
             console.log('DONE!!!', domains[3].get('name'));
