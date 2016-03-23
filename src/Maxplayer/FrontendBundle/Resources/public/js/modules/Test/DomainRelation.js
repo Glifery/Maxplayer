@@ -8,33 +8,36 @@ define([
     Artist
     ) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
-    console.log('This is DomainRelation');
+    console.log('This is DomainRelation 2');
 
     var artist = new Artist();
     artist.set('name', 'Rhapsody');
 
     artist
-        .similar()
+        .getSimilar()
         .then(function(collection) {
             var domains = collection.getDomains();
 
             console.log('DONE!!!', domains[3].get('name'));
 
-            return domains[3].similar();
+            return domains[3].getTopTracks();
+            //return domains[3].getSimilar();
         })
         .then(function(collection) {
+            console.log('collection', collection);
             var domains = collection.getDomains();
 
             console.log('DONE!!!', domains[3].get('name'));
 
-            return domains[3].similar();
+            return domains[3].getSimilar();
         })
         .then(function(collection) {
+            console.log('collection', collection);
             var domains = collection.getDomains();
 
             console.log('DONE!!!', domains[3].get('name'));
 
-            return domains[3].similar();
+            return domains[3].getSimilar();
         })
     ;
 });

@@ -17,42 +17,28 @@ define([
 ) {
     var ArtistPoolServiceClass = ArtistPoolService;
     ArtistPoolServiceClass.prototype = new DomainPool;
-    ArtistPoolServiceClass.prototype.domainCode = 'artist';
     ArtistPoolServiceClass.prototype.createNewDomain = _createNewDomain;
 
-    ArtistPoolServiceClass.prototype.getSimilar = _getSimilar;
+    ArtistPoolServiceClass.prototype.artistGetSimilar = _artistGetSimilar;
     ArtistPoolServiceClass.prototype.search = _search;
 
     function ArtistPoolService() {}
 
-    function _getSimilar(domain) {
+    function _artistGetSimilar(artist) {
         var _this = this,
-            request = this.createRequestByDomain(domain, this.domainCode)
+            request = this.createRequestByDomain(artist, 'artist')
         ;
-        console.log('similar to', request);
 
-        return new Promise(function(resolve, reject) {
-            LastFmResourceService
-                .artistGetSimilar(request)
-                .then(function(responce) {
-                        var collection = new Collection();
-
-                        _.each(responce.similarartists.artist, function(item) {
-                            var domain = _this.findOrCreate(item),
-                                sort = parseFloat(item.match)
-                            ;
-
-                            collection.addDomain(domain, sort);
-                        });
-
-                        resolve(collection);
-                    },
-                    function(responce) {
-                        reject(responce);
-                    }
-                )
-            ;
-        });
+        return LastFmResourceService
+            .artistGetSimilar(request)
+            .then(function(response) {
+                    return _this.populateCollection(response.similarartists.artist, function(item) {return item.match});
+                },
+                function(response) {
+                    console.log('REJECT artistGetSimilar()', response);
+                }
+            )
+        ;
     }
 
     function _search(artistName) {
@@ -60,26 +46,16 @@ define([
             request = {'artist': artistName}
         ;
 
-        return new Promise(function(resolve, reject) {
-            LastFmResourceService
-                .artistSearch(request)
-                .then(function(responce) {
-                    var collection = new Collection();
-
-                    _.each(responce.results.artistmatches.artist, function(item) {
-                        var domain = _this.findOrCreate(item);
-
-                        collection.addDomain(domain);
-                    });
-
-                    resolve(collection);
+        return LastFmResourceService
+            .artistSearch(request)
+            .then(function(response) {
+                    return _this.populateCollection(response.results.artistmatches.artist, null);
                 },
-                function(responce) {
-                    reject(responce);
+                function(response) {
+                    console.log('REJECT artistSearch()', response);
                 }
             )
-            ;
-        });
+        ;
     }
 
     function _createNewDomain() {

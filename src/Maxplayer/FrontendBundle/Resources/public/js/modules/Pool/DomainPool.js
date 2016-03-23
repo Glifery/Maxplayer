@@ -1,16 +1,18 @@
 define([
     'Utils/CheckType',
     'Utils/Debug',
-    'underscore'
+    'underscore',
+    'Domain/Collection'
 ], function (
     CheckType,
     Debug,
-    _
+    _,
+    Collection
 ) {
     var DomainPoolClass = DomainPool;
     DomainPoolClass.prototype.pool = {};
-    DomainPoolClass.prototype.findOrCreate = _findOrCreate;
     DomainPoolClass.prototype.createRequestByDomain = _createRequestByDomain;
+    DomainPoolClass.prototype.populateCollection = _populateCollection;
 
     function DomainPool() {}
 
@@ -24,6 +26,22 @@ define([
         }
 
         return request;
+    }
+
+    function _populateCollection(responseElements, sortCallback) {
+        var _this = this,
+            collection = new Collection()
+        ;
+
+        _.each(responseElements, function(item) {
+            var domain = _findOrCreate.call(_this, item),
+                sort = (typeof sortCallback === 'function') ? parseFloat(sortCallback(item)) : null;
+            ;
+
+            collection.addDomain(domain, sort);
+        });
+
+        return collection;
     }
 
     function _findOrCreate(info) {
