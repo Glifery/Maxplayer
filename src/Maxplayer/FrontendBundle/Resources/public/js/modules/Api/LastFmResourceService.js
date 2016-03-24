@@ -29,11 +29,31 @@ define([
                 limit: 5
             }
         })
+        .addRoute('artistGetInfo', {
+            params: {
+                method: 'artist.getInfo',
+                autocorrect: 1
+            }
+        })
         .addRoute('artistGetSimilar', {
             params: {
                 method: 'artist.getSimilar',
                 autocorrect: 1,
                 limit: 10
+            }
+        })
+        .addRoute('artistGetTopAlbums', {
+            params: {
+                method: 'artist.getTopAlbums',
+                autocorrect: 1,
+                limit: 30
+            }
+        })
+        .addRoute('artistGetTopTracks', {
+            params: {
+                method: 'artist.getTopTracks',
+                autocorrect: 1,
+                limit: 50
             }
         })
         .addRoute('albumSearch', {

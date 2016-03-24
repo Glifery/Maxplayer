@@ -4,54 +4,57 @@ define([
     'underscore',
     'Pool/DomainPool',
     'Api/LastFmResourceService',
-    'Domain/Track',
-    'Domain/Collection'
+    'Domain/Track'
 ], function (
     CheckType,
     Debug,
     _,
     DomainPool,
     LastFmResourceService,
-    Track,
-    Collection
+    Track
 ) {
     var TrackPoolServiceClass = TrackPoolService;
     TrackPoolServiceClass.prototype = new DomainPool;
     TrackPoolServiceClass.prototype.domainCode = 'track';
     TrackPoolServiceClass.prototype.createNewDomain = _createNewDomain;
 
-    TrackPoolServiceClass.prototype.getSimilar = _getSimilar;
+    TrackPoolServiceClass.prototype.trackGetSimilar = _trackGetSimilar;
+    TrackPoolServiceClass.prototype.artistGetTopTracks = _artistGetTopTracks;
     TrackPoolServiceClass.prototype.search = _search;
 
     function TrackPoolService() {}
 
-    function _getSimilar(domain) {
+    function _artistGetTopTracks(artist) {
         var _this = this,
-            request = this.createRequestByDomain(domain, this.domainCode)
+            request = this.createRequestByDomain(artist, 'artist')
         ;
 
-        return new Promise(function(resolve, reject) {
-            LastFmResourceService
-                .trackGetSimilar(request)
-                .then(function(response) {
-                        var collection = new Collection();
+        return LastFmResourceService
+            .artistGetTopTracks(request)
+            .then(function(response) {
+                return _this.populateCollection(response.toptracks.track, function(item) {return item.listeners});
+            },
+            function(response) {
+                console.log('REJECT artistGetTopTracks()', response);
+            })
+        ;
+    }
 
-                        _.each(response.similartracks.track, function(item) {
-                            var domain = _this.findOrCreate(item),
-                                sort = parseFloat(item.match)
-                            ;
+    function _trackGetSimilar(domain) {
+        var _this = this,
+            request = this.createRequestByDomain(domain, 'track')
+        ;
 
-                            collection.addDomain(domain, sort);
-                        });
-
-                        resolve(collection);
-                    },
-                    function(response) {
-                        reject(response);
-                    }
-                )
-            ;
-        });
+        return LastFmResourceService
+            .trackGetSimilar(request)
+            .then(function(response) {
+                    return _this.populateCollection(response.similartracks.track, function(item) {return item.match});
+                },
+                function(response) {
+                    console.log('REJECT trackGetSimilar()', response);
+                }
+            )
+        ;
     }
 
     function _search(trackName) {
@@ -59,26 +62,16 @@ define([
             request = {'track': trackName}
         ;
 
-        return new Promise(function(resolve, reject) {
-            LastFmResourceService
-                .trackSearch(request)
-                .then(function(response) {
-                    var collection = new Collection();
-
-                    _.each(response.results.trackmatches.track, function(item) {
-                        var domain = _this.findOrCreate(item);
-
-                        collection.addDomain(domain);
-                    });
-
-                    resolve(collection);
+        return LastFmResourceService
+            .trackSearch(request)
+            .then(function(response) {
+                    return _this.populateCollection(response.results.trackmatches.track, null);
                 },
                 function(response) {
-                    reject(response);
+                    console.log('REJECT trackSearch()', response);
                 }
             )
-            ;
-        });
+        ;
     }
 
     function _createNewDomain() {
