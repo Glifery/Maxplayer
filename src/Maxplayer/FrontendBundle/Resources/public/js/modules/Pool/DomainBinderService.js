@@ -33,6 +33,13 @@ define([
 
         return this._promise_getTopTracks;
     };
+    Artist.prototype.getTopAlbums = function() {
+        if (!this._promise_getTopAlbums) {
+            this._promise_getTopAlbums = AlbumPoolService.artistGetTopAlbums(this);
+        }
+
+        return this._promise_getTopAlbums;
+    };
 
     Track.prototype.getSimilar = function() {
         if (!this._promise_getSimilar) {

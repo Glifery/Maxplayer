@@ -15,14 +15,30 @@ define([
 ) {
     var TrackPoolServiceClass = TrackPoolService;
     TrackPoolServiceClass.prototype = new DomainPool;
-    TrackPoolServiceClass.prototype.createNewDomain = _createNewDomain;
     TrackPoolServiceClass.prototype.domainCode = 'track';
+    TrackPoolServiceClass.prototype.createNewDomain = _createNewDomain;
 
     TrackPoolServiceClass.prototype.trackGetSimilar = _trackGetSimilar;
     TrackPoolServiceClass.prototype.artistGetTopTracks = _artistGetTopTracks;
     TrackPoolServiceClass.prototype.search = _search;
 
     function TrackPoolService() {}
+
+    function _artistGetTopTracks(artist) {
+        var _this = this,
+            request = this.createRequestByDomain(artist, 'artist')
+        ;
+
+        return LastFmResourceService
+            .artistGetTopTracks(request)
+            .then(function(response) {
+                return _this.populateCollection(response.toptracks.track, function(item) {return item.listeners});
+            },
+            function(response) {
+                console.log('REJECT artistGetTopTracks()', response);
+            })
+        ;
+    }
 
     function _trackGetSimilar(domain) {
         var _this = this,
@@ -38,22 +54,6 @@ define([
                     console.log('REJECT trackGetSimilar()', response);
                 }
             )
-        ;
-    }
-
-    function _artistGetTopTracks(artist) {
-        var _this = this,
-            request = this.createRequestByDomain(artist, 'artist')
-        ;
-
-        return LastFmResourceService
-            .artistGetTopTracks(request)
-            .then(function(response) {
-                return _this.populateCollection(response.toptracks.track, function(item) {return item.listeners});
-            },
-            function(response) {
-                console.log('REJECT artistGetTopTracks()', response);
-            })
         ;
     }
 

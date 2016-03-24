@@ -14,6 +14,7 @@ define([
     DomainPoolClass.prototype.createRequestByDomain = _createRequestByDomain;
     DomainPoolClass.prototype.populateCollection = _populateCollection;
     DomainPoolClass.prototype.findOrCreate = _findOrCreate;
+    DomainPoolClass.prototype.setParentRelation = _setParentRelation;
 
     function DomainPool() {}
 
@@ -85,6 +86,15 @@ define([
         }
 
         return domain;
+    }
+
+    function _setParentRelation(parentDomainCode, parent) {
+        var parentVar = '_relation_' + parentDomainCode;
+
+        return function (domain) {
+            domain.set(parentDomainCode, parent.get('name'));
+            domain[parentVar] = parent;
+        }
     }
 
     function _normalizeImages(imagesInfo) {

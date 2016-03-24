@@ -42,6 +42,13 @@ define([
                 limit: 10
             }
         })
+        .addRoute('artistGetTopAlbums', {
+            params: {
+                method: 'artist.getTopAlbums',
+                autocorrect: 1,
+                limit: 30
+            }
+        })
         .addRoute('artistGetTopTracks', {
             params: {
                 method: 'artist.getTopTracks',

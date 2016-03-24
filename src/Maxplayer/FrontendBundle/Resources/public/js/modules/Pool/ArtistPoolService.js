@@ -15,8 +15,8 @@ define([
 ) {
     var ArtistPoolServiceClass = ArtistPoolService;
     ArtistPoolServiceClass.prototype = new DomainPool;
-    ArtistPoolServiceClass.prototype.createNewDomain = _createNewDomain;
     ArtistPoolServiceClass.prototype.domainCode = 'artist';
+    ArtistPoolServiceClass.prototype.createNewDomain = _createNewDomain;
 
     ArtistPoolServiceClass.prototype.artistGetSimilar = _artistGetSimilar;
     ArtistPoolServiceClass.prototype.trackGetArtist = _trackGetArtist;

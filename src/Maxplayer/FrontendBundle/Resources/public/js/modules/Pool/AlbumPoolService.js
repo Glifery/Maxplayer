@@ -20,35 +20,43 @@ define([
     AlbumPoolServiceClass.prototype.domainCode = 'album';
     AlbumPoolServiceClass.prototype.createNewDomain = _createNewDomain;
 
+    AlbumPoolServiceClass.prototype.artistGetTopAlbums = _artistGetTopAlbums;
     AlbumPoolServiceClass.prototype.search = _search;
 
     function AlbumPoolService() {}
+
+    function _artistGetTopAlbums(artist) {
+        var _this = this,
+            request = this.createRequestByDomain(artist, 'artist')
+        ;
+
+        return LastFmResourceService
+            .artistGetTopAlbums(request)
+            .then(function(response) {
+                    return _this.populateCollection(response.topalbums.album, null, _this.setParentRelation('artist', artist));
+                },
+                function(response) {
+                    console.log('REJECT artistGetTopAlbums()', response);
+                }
+            )
+        ;
+    }
 
     function _search(albumName) {
         var _this = this,
             request = {'album': albumName}
         ;
 
-        return new Promise(function(resolve, reject) {
-            LastFmResourceService
-                .albumSearch(request)
-                .then(function(responce) {
-                    var collection = new Collection();
-
-                    _.each(responce.results.albummatches.album, function(item) {
-                        var domain = _this.findOrCreate(item);
-
-                        collection.addDomain(domain);
-                    });
-
-                    resolve(collection);
+        return LastFmResourceService
+            .albumSearch(request)
+            .then(function(response) {
+                    return _this.populateCollection(response.results.albummatches.album, null);
                 },
-                function(responce) {
-                    reject(responce);
+                function(response) {
+                    console.log('REJECT albumSearch()', response);
                 }
             )
-            ;
-        });
+        ;
     }
 
     function _createNewDomain() {
