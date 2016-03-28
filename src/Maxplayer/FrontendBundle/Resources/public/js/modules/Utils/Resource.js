@@ -64,12 +64,19 @@ define([
      * @param object opts
      * @returns {*}
      */
-    function _prepareUrl(url, opts) {
+    function _prepareUrl(url, opts, removeMatch) {
         var textTransformer = $text();
         consoleProcess.log('prepareUrl beg', url, opts);
 
         if (checkType.obj(opts) && checkType.has(opts, 'params')) {
-            var handler = $textReplaceHandler(opts.params, {startSymbol: opts.urlReplace.start, endSymbol: opts.urlReplace.stop});
+            var handler = $textReplaceHandler(
+                opts.params,
+                {
+                    startSymbol: opts.urlReplace.start,
+                    endSymbol: opts.urlReplace.stop,
+                    removeMatch: removeMatch ? true : false
+                }
+            );
 
             textTransformer
                 .handler(handler)
@@ -134,6 +141,11 @@ define([
 
             $.extend(true, ajaxParams, opts.params, params);
             ajaxData.data = ajaxParams;
+
+            ajaxData.url = _prepareUrl(ajaxData.url, {
+                'params': ajaxParams,
+                'urlReplace': opts.urlReplace
+            }, true);
 
             ajaxPromise = _returnAjaxPromise(ajaxData);
 

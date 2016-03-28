@@ -21,7 +21,9 @@ define([
     function _createRequestByDomain(domain, domainCode) {
         var request = {};
 
-        if (domain.get('mbid')) {
+        if (domain.get('id')) {
+            request.id = domain.get('id');
+        } else if (domain.get('mbid')) {
             request.mbid = domain.get('mbid');
         } else {
             request[domainCode] = domain.get('name');
@@ -30,17 +32,19 @@ define([
         return request;
     }
 
-    function _populateCollection(responseElements, sortCallback) {
+    function _populateCollection(responseElements, eachCallback) {
         var _this = this,
             collection = new Collection()
         ;
 
         _.each(responseElements, function(item) {
-            var domain = _this.findOrCreate(item),
-                sort = (typeof sortCallback === 'function') ? parseFloat(sortCallback(item)) : null;
-            ;
+            var domain = _this.findOrCreate(item);
 
-            collection.addDomain(domain, sort);
+            if (typeof eachCallback === 'function') {
+                eachCallback.call(_this, domain);
+            }
+
+            collection.addDomain(domain);
         });
 
         return collection;
@@ -48,6 +52,10 @@ define([
 
     function _findOrCreate(info, anotherDomainCode) {
         var domainCode = anotherDomainCode ? anotherDomainCode : this.domainCode;
+
+        if (info.hasOwnProperty('id') && this.pool[domainCode].hasOwnProperty(info.id)) {
+            return this.pool[domainCode][info.id];
+        }
 
         if (info.hasOwnProperty('mbid') && this.pool[domainCode].hasOwnProperty(info.mbid)) {
             return this.pool[domainCode][info.mbid];
@@ -59,20 +67,53 @@ define([
 
         var domain = this.createNewDomain();
 
+        if (info.hasOwnProperty('id')) {
+            domain.set('id', info.id);
+        }
         if (info.hasOwnProperty('mbid')) {
             domain.set('mbid', info.mbid);
         }
         if (info.hasOwnProperty('name')) {
             domain.set('name', info.name);
         }
+        if (info.hasOwnProperty('artists')) {
+            for (var index in info.artists) {
+                var artistInfo = info.artists[index],
+                    artistElement = this.findOrCreate(artistInfo, 'artist')
+                ;
+
+                if (!domain._relation_artist) {
+                    domain._relation_artist = artistElement;
+                    domain.set('artist', artistElement);
+                }
+            }
+        }
         if (info.hasOwnProperty('artist')) {
             var artistInfo = (typeof info.artist === 'object') ? info.artist : {'name': info.artist};
 
             domain._relation_artist = this.findOrCreate(artistInfo, 'artist');
-            domain.set('artist', domain._relation_artist.get('name'));
+            domain.set('artist', domain._relation_artist);
+        }
+        if (info.hasOwnProperty('album')) {
+            var albumInfo = info.album,
+                albumElement = this.findOrCreate(albumInfo, 'album')
+            ;
+
+            if (!domain._relation_album) {
+                domain._relation_album = albumElement;
+                domain.set('album', albumElement);
+
+                if (domain._relation_artist) {
+                    albumElement._relation_artist = domain._relation_artist;
+                    albumElement.set('artist', domain._relation_artist);
+                }
+            }
         }
         if (info.hasOwnProperty('id')) {
             domain.set('id', info.id);
+        }
+        if (info.hasOwnProperty('images')) {
+            domain.set('images', _normalizeImages(info.images));
         }
         if (info.hasOwnProperty('image')) {
             domain.set('images', _normalizeImages(info.image));
@@ -101,7 +142,11 @@ define([
         var images = {};
 
         for (var index in imagesInfo) {
-            images[imagesInfo[index].size] = imagesInfo[index]['#text'];
+            if (imagesInfo[index].size) {
+                images[imagesInfo[index].size] = imagesInfo[index]['#text'];
+            } else if (imagesInfo[index].width) {
+                images[imagesInfo[index].width] = imagesInfo[index].url;
+            }
         }
 
         return images;

@@ -3,14 +3,14 @@ define([
     'Utils/Debug',
     'underscore',
     'Pool/DomainPool',
-    'Api/LastFmResourceService',
+    'Api/SpotifyResourceService',
     'Domain/Track'
 ], function (
     CheckType,
     Debug,
     _,
     DomainPool,
-    LastFmResourceService,
+    MusicResourceService,
     Track
 ) {
     var TrackPoolServiceClass = TrackPoolService;
@@ -18,9 +18,9 @@ define([
     TrackPoolServiceClass.prototype.domainCode = 'track';
     TrackPoolServiceClass.prototype.createNewDomain = _createNewDomain;
 
-    TrackPoolServiceClass.prototype.trackGetSimilar = _trackGetSimilar;
     TrackPoolServiceClass.prototype.artistGetTopTracks = _artistGetTopTracks;
-    TrackPoolServiceClass.prototype.search = _search;
+    TrackPoolServiceClass.prototype.albumGetTracks = _albumGetTracks;
+    TrackPoolServiceClass.prototype.trackGetSimilar = _trackGetSimilar;
 
     function TrackPoolService() {}
 
@@ -29,10 +29,10 @@ define([
             request = this.createRequestByDomain(artist, 'artist')
         ;
 
-        return LastFmResourceService
+        return MusicResourceService
             .artistGetTopTracks(request)
             .then(function(response) {
-                return _this.populateCollection(response.toptracks.track, function(item) {return item.listeners});
+                return _this.populateCollection(response);
             },
             function(response) {
                 console.log('REJECT artistGetTopTracks()', response);
@@ -40,15 +40,34 @@ define([
         ;
     }
 
+    function _albumGetTracks(album) {
+        var _this = this,
+            request = this.createRequestByDomain(album, 'album')
+        ;
+
+        return MusicResourceService
+            .albumGetTracks(request)
+            .then(function(response) {
+                return _this.populateCollection(response, function(track) {
+                    track._relation_album = album;
+                    track.set('album', album);
+                });
+            },
+            function(response) {
+                console.log('REJECT albumGetTracks()', response);
+            })
+            ;
+    }
+
     function _trackGetSimilar(domain) {
         var _this = this,
             request = this.createRequestByDomain(domain, 'track')
         ;
 
-        return LastFmResourceService
+        return MusicResourceService
             .trackGetSimilar(request)
             .then(function(response) {
-                    return _this.populateCollection(response.similartracks.track, function(item) {return item.match});
+                    return _this.populateCollection(response);
                 },
                 function(response) {
                     console.log('REJECT trackGetSimilar()', response);
@@ -62,10 +81,10 @@ define([
             request = {'track': trackName}
         ;
 
-        return LastFmResourceService
+        return MusicResourceService
             .trackSearch(request)
             .then(function(response) {
-                    return _this.populateCollection(response.results.trackmatches.track, null);
+                    return _this.populateCollection(response);
                 },
                 function(response) {
                     console.log('REJECT trackSearch()', response);

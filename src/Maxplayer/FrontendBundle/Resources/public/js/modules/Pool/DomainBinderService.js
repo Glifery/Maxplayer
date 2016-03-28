@@ -26,19 +26,19 @@ define([
 
         return this._promise_getSimilar
     };
+    Artist.prototype.getAlbums = function() {
+        if (!this._promise_getAlbums) {
+            this._promise_getAlbums = AlbumPoolService.artistGetAlbums(this);
+        }
+
+        return this._promise_getAlbums;
+    };
     Artist.prototype.getTopTracks = function() {
         if (!this._promise_getTopTracks) {
             this._promise_getTopTracks = TrackPoolService.artistGetTopTracks(this);
         }
 
         return this._promise_getTopTracks;
-    };
-    Artist.prototype.getTopAlbums = function() {
-        if (!this._promise_getTopAlbums) {
-            this._promise_getTopAlbums = AlbumPoolService.artistGetTopAlbums(this);
-        }
-
-        return this._promise_getTopAlbums;
     };
 
     Track.prototype.getSimilar = function() {
@@ -55,11 +55,23 @@ define([
                 console.log('resolve!!!');
             } else {
                 this._promise_getArtist = ArtistPoolService.trackGetArtist(this);
-                console.log('new...');
+                console.log('FIX!!!');
             }
         }
 
         return this._promise_getArtist
+    };
+    Track.prototype.getAlbum = function() {
+        if (!this._promise_getAlbum) {
+            if (this._relation_album) {
+                this._promise_getAlbum = Promise.resolve(this._relation_album);
+            } else {
+                this._promise_getArtist = AlbumPoolService.trackGetAlbum(this);
+                console.log('FIX!!!');
+            }
+        }
+
+        return this._promise_getAlbum
     };
 
     //Track.prototype.similar = function() {

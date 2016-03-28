@@ -27,6 +27,9 @@ define([
             params: {
                 method: 'artist.search',
                 limit: 5
+            },
+            done: function(response) {
+                return response.results.artistmatches.artist;
             }
         })
         .addRoute('artistGetInfo', {
@@ -40,13 +43,19 @@ define([
                 method: 'artist.getSimilar',
                 autocorrect: 1,
                 limit: 10
+            },
+            done: function(response) {
+                return response.similarartists.artist;
             }
         })
-        .addRoute('artistGetTopAlbums', {
+        .addRoute('artistGetAlbums', {
             params: {
                 method: 'artist.getTopAlbums',
                 autocorrect: 1,
                 limit: 30
+            },
+            done: function(response) {
+                return response.topalbums.album;
             }
         })
         .addRoute('artistGetTopTracks', {
@@ -54,18 +63,27 @@ define([
                 method: 'artist.getTopTracks',
                 autocorrect: 1,
                 limit: 50
+            },
+            done: function(response) {
+                return response.toptracks.track;
             }
         })
         .addRoute('albumSearch', {
             params: {
                 method: 'album.search',
                 limit: 5
+            },
+            done: function(response) {
+                return response.results.albummatches.album;
             }
         })
         .addRoute('trackSearch', {
             params: {
                 method: 'track.search',
                 limit: 5
+            },
+            done: function(response) {
+                return response.results.trackmatches.track;
             }
         })
         .addRoute('trackGetSimilar', {
@@ -73,6 +91,9 @@ define([
                 method: 'track.getSimilar',
                 autocorrect: 1,
                 limit: 10
+            },
+            done: function(response) {
+                return response.similartracks.track;
             }
         })
         .addRoute('tagSearch', {

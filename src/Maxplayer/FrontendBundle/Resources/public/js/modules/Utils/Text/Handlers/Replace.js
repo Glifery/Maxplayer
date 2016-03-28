@@ -12,7 +12,8 @@ define([
 
     var defaultOpts = {
         startSymbol: '{{',
-        endSymbol: '}}'
+        endSymbol: '}}',
+        removeMatch: false
     }
 
     var handler = function(args, opts) {
@@ -31,7 +32,9 @@ define([
     }
 
     function replace(string, replaceMap, opts, root) {
-        var reg = null;
+        var reg = null,
+            previous = ''
+        ;
 
         for (var pattern in replaceMap) {
             consoleReplace.log('..start pattern', root+pattern);
@@ -43,8 +46,13 @@ define([
                     reg = new RegExp(normalizePattern(root+pattern, opts), 'g');
                     consoleReplace.log('......pattern', normalizePattern(root+pattern, opts), 'transform to reg', reg);
 
+                    previous = string;
                     string = string.replace(reg, replaceMap[pattern]);
                     consoleReplace.log('......replace', root+pattern, 'to', replaceMap[pattern], ': result', string);
+
+                    if (checkType.has(opts, 'removeMatch') && (opts.removeMatch) && (previous !== string)) {
+                        delete replaceMap[pattern];
+                    }
                 } else {
                     consoleReplace.log('......requrcy! deep to', replaceMap[pattern], 'with prefix', root+pattern+'.');
 

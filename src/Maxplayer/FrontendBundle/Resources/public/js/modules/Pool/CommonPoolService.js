@@ -3,15 +3,13 @@ define([
     'Utils/Debug',
     'underscore',
     'Pool/DomainPool',
-    'Api/SpotifyResourceService',
-    'Domain/Artist'
+    'Api/SpotifyResourceService'
 ], function (
     CheckType,
     Debug,
     _,
     DomainPool,
-    MusicResourceService,
-    Artist
+    MusicResourceService
 ) {
     var ArtistPoolServiceClass = ArtistPoolService;
     ArtistPoolServiceClass.prototype = new DomainPool;
@@ -19,7 +17,6 @@ define([
     ArtistPoolServiceClass.prototype.createNewDomain = _createNewDomain;
 
     ArtistPoolServiceClass.prototype.artistGetSimilar = _artistGetSimilar;
-    ArtistPoolServiceClass.prototype.albumGetArtist = _albumGetArtist;
     ArtistPoolServiceClass.prototype.trackGetArtist = _trackGetArtist;
     ArtistPoolServiceClass.prototype.search = _search;
 
@@ -42,39 +39,20 @@ define([
         ;
     }
 
-    function _albumGetArtist(album) {
-        var _this = this,
-            request = this.createRequestByDomain(album, 'album')
-        ;
-
-        return MusicResourceService
-            .albumGetInfo(request)
-            .then(function(response) {
-                    var artist = _this.findOrCreate(response.artist[0]);
-
-                    return artist;
-                },
-                function(response) {
-                    console.log('REJECT albumGetInfo()', response);
-                }
-            )
-        ;
-    }
-
     function _trackGetArtist(track) {
         var _this = this,
-            request = this.createRequestByDomain(track, 'track')
+            request = {'artist': track.get('artist')}
         ;
 
         return MusicResourceService
-            .trackGetInfo(request)
+            .artistGetInfo(request)
             .then(function(response) {
-                    var artist = _this.findOrCreate(response.artist[0]);
+                    var artist = _this.findOrCreate(response.artist);
 
                     return artist;
                 },
                 function(response) {
-                    console.log('REJECT trackGetInfo()', response);
+                    console.log('REJECT artistGetInfo()', response);
                 }
             )
         ;
