@@ -35,7 +35,7 @@ define([
             .then(function(response) {
                     return _this.populateCollection(response, function(album) {
                         album._relation_album = artist;
-                        album.set('album', artist);
+                        album.set('album', artist.get('name'));
                     });
                 },
                 function(response) {

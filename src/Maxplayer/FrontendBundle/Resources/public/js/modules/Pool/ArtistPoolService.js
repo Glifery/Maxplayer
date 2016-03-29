@@ -21,7 +21,6 @@ define([
     ArtistPoolServiceClass.prototype.artistGetSimilar = _artistGetSimilar;
     ArtistPoolServiceClass.prototype.albumGetArtist = _albumGetArtist;
     ArtistPoolServiceClass.prototype.trackGetArtist = _trackGetArtist;
-    ArtistPoolServiceClass.prototype.search = _search;
 
     function ArtistPoolService() {}
 

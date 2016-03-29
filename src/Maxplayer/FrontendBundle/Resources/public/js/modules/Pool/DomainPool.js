@@ -14,7 +14,6 @@ define([
     DomainPoolClass.prototype.createRequestByDomain = _createRequestByDomain;
     DomainPoolClass.prototype.populateCollection = _populateCollection;
     DomainPoolClass.prototype.findOrCreate = _findOrCreate;
-    DomainPoolClass.prototype.setParentRelation = _setParentRelation;
 
     function DomainPool() {}
 
@@ -50,19 +49,42 @@ define([
         return collection;
     }
 
+    function _findDomainInPool(domainPool, info, domainCode) {
+        if (!domainPool.pool.hasOwnProperty(domainCode)) {
+            return null;
+        }
+
+        if (info.hasOwnProperty('id') && domainPool.pool[domainCode].hasOwnProperty(info.id)) {
+            return domainPool.pool[domainCode][info.id];
+        }
+
+        if (info.hasOwnProperty('mbid') && domainPool.pool[domainCode].hasOwnProperty(info.mbid)) {
+            return domainPool.pool[domainCode][info.mbid];
+        }
+
+        if (info.hasOwnProperty('name') && domainPool.pool[domainCode].hasOwnProperty(info.name)) {
+            return domainPool.pool[domainCode][info.name];
+        }
+
+        return null;
+    }
+
+    function _registerDomainInPool(domainPool, domain, domainCode) {
+        if (domain.get('mbid')) {
+            domainPool.pool[domainCode][domain.get('mbid')] = domain;
+        }
+        if (domain.get('name')) {
+            domainPool.pool[domainCode][domain.get('name')] = domain;
+        }
+    }
+
     function _findOrCreate(info, anotherDomainCode) {
-        var domainCode = anotherDomainCode ? anotherDomainCode : this.domainCode;
+        var domainCode = anotherDomainCode ? anotherDomainCode : this.domainCode,
+            foundDomain = _findDomainInPool(this, info, domainCode)
+        ;
 
-        if (info.hasOwnProperty('id') && this.pool[domainCode].hasOwnProperty(info.id)) {
-            return this.pool[domainCode][info.id];
-        }
-
-        if (info.hasOwnProperty('mbid') && this.pool[domainCode].hasOwnProperty(info.mbid)) {
-            return this.pool[domainCode][info.mbid];
-        }
-
-        if (info.hasOwnProperty('name') && this.pool[domainCode].hasOwnProperty(info.name)) {
-            return this.pool[domainCode][info.name];
+        if (foundDomain) {
+            return foundDomain;
         }
 
         var domain = this.createNewDomain();
@@ -84,29 +106,31 @@ define([
 
                 if (!domain._relation_artist) {
                     domain._relation_artist = artistElement;
-                    domain.set('artist', artistElement);
+                    domain.set('artist', artistElement.get('name'));
                 }
             }
         }
         if (info.hasOwnProperty('artist')) {
-            var artistInfo = (typeof info.artist === 'object') ? info.artist : {'name': info.artist};
+            var artistInfo = (typeof info.artist === 'object') ? info.artist : {'name': info.artist},
+                artistElement = this.findOrCreate(artistInfo, 'artist')
+            ;
 
-            domain._relation_artist = this.findOrCreate(artistInfo, 'artist');
-            domain.set('artist', domain._relation_artist);
+            domain._relation_artist = artistElement;
+            domain.set('artist', artistElement.get('name'));
         }
         if (info.hasOwnProperty('album')) {
             var albumInfo = info.album,
                 albumElement = this.findOrCreate(albumInfo, 'album')
             ;
 
+            if ((!albumElement._relation_artist) && domain._relation_artist) {
+                albumElement._relation_artist = domain._relation_artist;
+                albumElement.set('artist', domain._relation_artist.get('name'));
+            }
+
             if (!domain._relation_album) {
                 domain._relation_album = albumElement;
-                domain.set('album', albumElement);
-
-                if (domain._relation_artist) {
-                    albumElement._relation_artist = domain._relation_artist;
-                    albumElement.set('artist', domain._relation_artist);
-                }
+                domain.set('album', albumElement.get('name'));
             }
         }
         if (info.hasOwnProperty('id')) {
@@ -119,23 +143,9 @@ define([
             domain.set('images', _normalizeImages(info.image));
         }
 
-        if (info.hasOwnProperty('mbid')) {
-            this.pool[domainCode][info.mbid] = domain;
-        }
-        if (info.hasOwnProperty('name')) {
-            this.pool[domainCode][info.name] = domain;
-        }
+        _registerDomainInPool(this, domain, domainCode);
 
         return domain;
-    }
-
-    function _setParentRelation(parentDomainCode, parent) {
-        var parentVar = '_relation_' + parentDomainCode;
-
-        return function (domain) {
-            domain.set(parentDomainCode, parent.get('name'));
-            domain[parentVar] = parent;
-        }
     }
 
     function _normalizeImages(imagesInfo) {

@@ -50,7 +50,7 @@ define([
             .then(function(response) {
                 return _this.populateCollection(response, function(track) {
                     track._relation_album = album;
-                    track.set('album', album);
+                    track.set('album', album.get('name'));
                 });
             },
             function(response) {
