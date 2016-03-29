@@ -4,7 +4,6 @@ define([
     'App',
     'Guess/Guesser',
     'jquery',
-    'Pool/SoundPoolService'
 ], function (
     App,
     Guesser,

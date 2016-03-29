@@ -1,7 +1,7 @@
 define([
     'backbone',
     'Domain/Collection',
-    'Guess/ProvidersSet'
+    'Guess/SpotifyProvidersSet'
 ], function (
     Backbone,
     Collection,
@@ -29,37 +29,23 @@ define([
                 return;
             }
 
-            promises = [
-                ProvidersSet
-                    .searchArtist(query)
-                    .then(function(collection) {
-                        _this.set('artist', collection);
-                    })
-                ,
-
-                ProvidersSet
-                    .searchAlbum(query)
-                    .then(function(collection) {
-                        _this.set('album', collection);
-                    })
-                ,
-
-                ProvidersSet
-                    .searchTrack(query)
-                    .then(function(collection) {
-                        _this.set('track', collection);
-                    })
-
-            ];
-
-            Promise
-                .all(promises)
-                .then(function() {
+            ProvidersSet.createSearchPromise(
+                    query,
+                    _getCallbackFor(_this, 'artist'),
+                    _getCallbackFor(_this, 'album'),
+                    _getCallbackFor(_this, 'track')
+                ).then(function() {
                     _this.trigger('change:all', _this);
                 })
             ;
         }
     });
+
+    function _getCallbackFor(guesser, domainCode) {
+        return function(collection) {
+            guesser.set(domainCode, collection);
+        }
+    }
 
     return Guesser;
 });

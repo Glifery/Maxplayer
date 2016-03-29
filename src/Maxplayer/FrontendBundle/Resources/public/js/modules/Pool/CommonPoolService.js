@@ -3,81 +3,84 @@ define([
     'Utils/Debug',
     'underscore',
     'Pool/DomainPool',
-    'Api/SpotifyResourceService'
+    'Api/SpotifyResourceService',
+    'Domain/Artist',
+    'Domain/Album',
+    'Domain/Track'
 ], function (
     CheckType,
     Debug,
     _,
     DomainPool,
-    MusicResourceService
+    MusicResourceService,
+    Artist,
+    Album,
+    Track
 ) {
-    var ArtistPoolServiceClass = ArtistPoolService;
-    ArtistPoolServiceClass.prototype = new DomainPool;
-    ArtistPoolServiceClass.prototype.domainCode = 'artist';
-    ArtistPoolServiceClass.prototype.createNewDomain = _createNewDomain;
+    var CommonPoolServiceClass = CommonPoolService;
+    CommonPoolServiceClass.prototype = new DomainPool;
 
-    ArtistPoolServiceClass.prototype.artistGetSimilar = _artistGetSimilar;
-    ArtistPoolServiceClass.prototype.trackGetArtist = _trackGetArtist;
-    ArtistPoolServiceClass.prototype.search = _search;
+    CommonPoolServiceClass.prototype.search = _search;
 
-    function ArtistPoolService() {}
+    var parametersMap = {
+        artist: {
+            name: 'artist',
+            domainCode: 'artist',
+            response: 'artists',
+            newDomainFunction: function() {return new Artist;}
+        },
+        album: {
+            name: 'album',
+            domainCode: 'album',
+            response: 'albums',
+            newDomainFunction: function() {return new Album;}
+        },
+        track: {
+            name: 'track',
+            domainCode: 'track',
+            response: 'tracks',
+            newDomainFunction: function() {return new Track;}
+        }
+    };
 
-    function _artistGetSimilar(artist) {
+    function CommonPoolService() {}
+
+    function _search(query) {
         var _this = this,
-            request = this.createRequestByDomain(artist, 'artist')
+            request = {
+                'q': query
+                //'type': 'album,artist,track'
+            }
         ;
 
         return MusicResourceService
-            .artistGetSimilar(request)
+            .search(request)
             .then(function(response) {
-                    return _this.populateCollection(response);
+                    return {
+                        'artist': _fetchCollection('artist', response, _this),
+                        'album': _fetchCollection('album', response, _this),
+                        'track': _fetchCollection('track', response, _this)
+                    };
                 },
                 function(response) {
-                    console.log('REJECT artistGetSimilar()', response);
+                    console.log('REJECT search()', response);
                 }
             )
         ;
     }
 
-    function _trackGetArtist(track) {
-        var _this = this,
-            request = {'artist': track.get('artist')}
-        ;
+    function _fetchCollection(domainCode, response, domainPool) {
+        var parameters = parametersMap[domainCode];
 
-        return MusicResourceService
-            .artistGetInfo(request)
-            .then(function(response) {
-                    var artist = _this.findOrCreate(response.artist);
+        domainPool.domainCode = parameters.domainCode;
+        domainPool.createNewDomain = parameters.newDomainFunction;
 
-                    return artist;
-                },
-                function(response) {
-                    console.log('REJECT artistGetInfo()', response);
-                }
-            )
-        ;
-    }
-
-    function _search(artistName) {
-        var _this = this,
-            request = {'artist': artistName}
-        ;
-
-        return MusicResourceService
-            .artistSearch(request)
-            .then(function(response) {
-                    return _this.populateCollection(response);
-                },
-                function(response) {
-                    console.log('REJECT artistSearch()', response);
-                }
-            )
-        ;
+        return domainPool.populateCollection(response[parameters.response]['items'])
     }
 
     function _createNewDomain() {
         return new Artist;
     }
 
-    return new ArtistPoolServiceClass();
+    return new CommonPoolServiceClass();
 });
