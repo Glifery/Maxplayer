@@ -11,11 +11,24 @@ define([
 ) {
     var DomainPoolClass = DomainPool;
     DomainPoolClass.prototype.pool = {'artist': {}, 'album': {}, 'track': {}, 'tag': {}};
+    DomainPoolClass.prototype.getById = _getById;
     DomainPoolClass.prototype.createRequestByDomain = _createRequestByDomain;
     DomainPoolClass.prototype.populateCollection = _populateCollection;
     DomainPoolClass.prototype.findOrCreate = _findOrCreate;
 
     function DomainPool() {}
+
+    function _getById(id, domainCode) {
+        if (!this.pool.hasOwnProperty(domainCode)) {
+            throw Error('Pool "' + domainCode + '" is empty.');
+        }
+
+        if (!this.pool[domainCode].hasOwnProperty(id)) {
+            throw Error('Can\'t find ' + domainCode + ' with id ' + id + '.');
+        }
+
+        return this.pool[domainCode][id];
+    }
 
     function _createRequestByDomain(domain, domainCode) {
         var request = {};
@@ -70,6 +83,9 @@ define([
     }
 
     function _registerDomainInPool(domainPool, domain, domainCode) {
+        if (domain.get('id')) {
+            domainPool.pool[domainCode][domain.get('id')] = domain;
+        }
         if (domain.get('mbid')) {
             domainPool.pool[domainCode][domain.get('mbid')] = domain;
         }

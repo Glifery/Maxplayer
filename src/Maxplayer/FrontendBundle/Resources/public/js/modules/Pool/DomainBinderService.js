@@ -36,7 +36,7 @@ define([
     Artist.prototype.getTopTracks = function() {
         if (!this._promise_getTopTracks) {
             this._promise_getTopTracks = TrackPoolService.artistGetTopTracks(this);
-        }
+        } else {console.log('from cache!');}
 
         return this._promise_getTopTracks;
     };

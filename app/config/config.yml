@@ -97,6 +97,12 @@ hearsay_require_js:
         spotify:
             location: /bundles/maxplayerfrontend/vendor/spotify-web-api-js/src/spotify-web-api
             external: true
+        text:
+            location: /bundles/maxplayerfrontend/vendor/text/text
+            external: true
+        template:
+            location: /bundles/maxplayerfrontend/js/templates
+            external: true
     shim:
         bootstrap:
             deps: [jquery]
