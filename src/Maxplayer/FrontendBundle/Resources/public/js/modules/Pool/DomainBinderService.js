@@ -6,8 +6,7 @@ define([
     'Pool/TrackPoolService',
     'Pool/TagPoolService',
     'Domain/Artist',
-    'Domain/Track',
-    'Domain/Tag'
+    'Domain/Track'
 ], function (
     CheckType,
     Debug,
@@ -16,8 +15,7 @@ define([
     TrackPoolService,
     TagPoolService,
     Artist,
-    Track,
-    Tag
+    Track
 ) {
     Artist.prototype.getSimilar = function() {
         if (!this._promise_getSimilar) {
@@ -39,6 +37,27 @@ define([
         }
 
         return this._promise_getTopTracks;
+    };
+
+    Album.prototype.getArtist = function() {
+        if (!this._promise_getArtist) {
+            if (this._relation_artist) {
+                this._promise_getArtist = Promise.resolve(this._relation_artist);
+                console.log('resolve!!!');
+            } else {
+                this._promise_getArtist = AlbumPoolService.albumGetArtist(this);
+                console.log('FIX!!!');
+            }
+        }
+
+        return this._promise_getArtist
+    };
+    Artist.prototype.getTracks = function() {
+        if (!this._promise_getTracks) {
+            this._promise_getTracks = TrackPoolService.albumGetTracks(this);
+        }
+
+        return this._promise_getTracks;
     };
 
     Track.prototype.getSimilar = function() {
@@ -73,11 +92,4 @@ define([
 
         return this._promise_getAlbum
     };
-
-    //Track.prototype.similar = function() {
-    //    return TrackPoolService.getSimilar(this);
-    //}
-    //Tag.prototype.similar = function() {
-    //    return TagPoolService.getSimilar(this);
-    //}
 });
