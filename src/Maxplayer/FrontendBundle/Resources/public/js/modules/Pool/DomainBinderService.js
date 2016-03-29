@@ -6,6 +6,7 @@ define([
     'Pool/TrackPoolService',
     'Pool/TagPoolService',
     'Domain/Artist',
+    'Domain/Album',
     'Domain/Track'
 ], function (
     CheckType,
@@ -15,6 +16,7 @@ define([
     TrackPoolService,
     TagPoolService,
     Artist,
+    Album,
     Track
 ) {
     Artist.prototype.getSimilar = function() {
