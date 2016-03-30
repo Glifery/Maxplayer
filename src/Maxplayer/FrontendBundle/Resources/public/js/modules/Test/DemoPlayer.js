@@ -55,11 +55,8 @@ define([
                 artist = ArtistPoolService.getById(id, 'artist')
             ;
 
-            artist.getTopTracks().then(function(collection) {
-                var track = collection.at(Math.floor(Math.random() * collection.length)).get('domain');
-
-                PlayerKitService.playset.add(track);
-            });
+            PlayerKitService.playset.set(artist);
+            PlayerKitService.playlist.gotoNextTrack();
         });
 
         $(document).on('click', '.js-playset-add-album', function() {
@@ -67,11 +64,8 @@ define([
                 album = ArtistPoolService.getById(id, 'album')
             ;
 
-            album.getTracks().then(function(collection) {
-                var track = collection.at(Math.floor(Math.random() * collection.length)).get('domain');
-
-                PlayerKitService.playset.add(track);
-            });
+            PlayerKitService.playset.set(album);
+            PlayerKitService.playlist.gotoNextTrack();
         });
 
         $(document).on('click', '.js-playset-add-track', function() {
@@ -79,7 +73,8 @@ define([
                 track = ArtistPoolService.getById(id, 'track')
             ;
 
-            PlayerKitService.playset.add(track);
+            PlayerKitService.playset.set(track);
+            PlayerKitService.playlist.gotoNextTrack();
         });
 
         PlayerKitService.playset.getCollection().on('update', function() {

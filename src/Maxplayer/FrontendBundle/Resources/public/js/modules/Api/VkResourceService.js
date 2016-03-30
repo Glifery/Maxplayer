@@ -15,7 +15,8 @@ define([
     var vk = new Resource({
         url: 'http://maxplayer.my/app_dev.php/rest/',
         method: 'POST',
-        done: _catchError
+        done: _handleResponse,
+        fail: _catchError
     });
 
     vk
@@ -23,6 +24,14 @@ define([
             url: 'track/sound'
         })
     ;
+
+    function _handleResponse(response) {
+        if (response.status !== 'success') {
+            throw new Error('VK API error: ' + response.errors[0]);
+        }
+
+        return response.data;
+    }
 
     function _catchError(responce) {
         if (!responce.hasOwnProperty('status') || (responce.status == 'error')) {

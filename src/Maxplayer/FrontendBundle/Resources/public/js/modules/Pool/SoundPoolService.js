@@ -36,13 +36,7 @@ define([
             VkResourceService
                 .trackSound(request)
                 .then(function(response) {
-                        var sound = null;
-
-                        if (response.status !== 'success') {
-                            reject(response);
-                        }
-
-                        sound = new Sound(response.data);
+                        sound = new Sound(response);
                         track.set('sound', sound);
 
                         resolve(sound);

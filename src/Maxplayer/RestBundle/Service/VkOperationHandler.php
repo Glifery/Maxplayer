@@ -34,9 +34,9 @@ class VkOperationHandler
 
     /**
      * @param Track $track
-     * @return Track
+     * @return Sound
      */
-    public function fillTrackSound(Track $track)
+    public function findTrackSound(Track $track)
     {
         $query = $track->getArtist().' - '.$track->getTrack();
 
@@ -69,6 +69,6 @@ class VkOperationHandler
 
         $track->setSound($sound);
 
-        return $track;
+        return $sound;
     }
 }
