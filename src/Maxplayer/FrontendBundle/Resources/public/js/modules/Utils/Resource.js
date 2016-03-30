@@ -1,239 +1,136 @@
 define([
-    'Utils/CheckType',
-    'Utils/Debug',
     'jquery',
     'underscore',
     'Utils/Text/Text',
     'Utils/Text/Handlers/Replace'
 ], function(
-    checkType,
-    debug,
     $,
     _,
     $text,
     $textReplaceHandler
 ){
-    var console = debug.console(['utils/resource']),
-        consoleProcess = console.console('process'),
-        consoleError = console.console('error'),
-        consoleAjax = console.console('ajax');
-
-    var requiredOptsFields = ['url'],
-        defaultOpts= {
-            method: 'GET',
-            urlReplace: {
-                start: '{',
-                stop: '}'
-            }
-        };
-
-    var ResourceClass = Resource;
-
-    function Resource(opts) {
-        this.opts = $.extend(true, defaultOpts, opts);
-    }
+    var ResourceClass = Resource,
+        register = {}
+    ;
 
     ResourceClass.prototype.addRoute = _addRoute;
 
-    /**
-     *
-     * @param object fields
-     * @param object obj
-     * @returns {boolean}
-     */
-    function _checkExisting(fields, obj) {
-        var isError = false;
-        consoleProcess.log('checkExisting beg', fields, obj);
-
-        for (var index in fields) {
-            if (!checkType.has(obj, fields[index])) {
-                isError = true;
-
-                consoleError.log('Try to create resource whithout parameter', fields[index]);
-            }
+    var defaultOpts = {
+        method: 'GET',
+        urlReplace: {
+            start: '{',
+            stop: '}'
         }
+    };
 
-        consoleProcess.log('checkExisting end: isError', isError);
+    function Resource(opts, data) {
+        this._opts = {};
+        this._data = data ? data : {};
+        this._routes = {};
 
-        return !isError;
+        _.extend(this._opts, defaultOpts, opts);
     }
 
-    /**
-     *
-     * @param string url
-     * @param object opts
-     * @returns {*}
-     */
-    function _prepareUrl(url, opts, removeMatch) {
-        var textTransformer = $text();
-        consoleProcess.log('prepareUrl beg', url, opts);
+    function _addRoute(routeName, opts, data) {
+        var routeInfo = {
+            routeName: routeName,
+            data: data ? _.extend({}, this._data, data) : _.clone(this._data),
+            opts: opts ? _.extend({}, this._opts, opts) : _.clone(this._opts)
+        };
 
-        if (checkType.obj(opts) && checkType.has(opts, 'params')) {
-            var handler = $textReplaceHandler(
-                opts.params,
-                {
-                    startSymbol: opts.urlReplace.start,
-                    endSymbol: opts.urlReplace.stop,
-                    removeMatch: removeMatch ? true : false
-                }
-            );
+        routeInfo['opts']['url'] = _mergeUrls(this._opts, opts);
 
-            textTransformer
-                .handler(handler)
-                .setText(url);
-
-            url = textTransformer.getText();
-        }
-
-        if ((url.indexOf(opts.urlReplace.start) != -1) || (url.indexOf(opts.urlReplace.stop) != -1)) {
-            consoleError.log('Incorrect URL (with placeholders)', url);
-        }
-
-        consoleProcess.log('prepareUrl end', url);
-
-        return url;
-    }
-
-    /**
-     *
-     * @param string name
-     * @param object routeOpts
-     * @returns Resource
-     */
-    function _addRoute(name, routeOpts) {
-        var routeFunction = _createRouteFunction(routeOpts, this.opts);
-
-        this[name] = routeFunction;
+        this._routes[routeName] = routeInfo;
+        this[routeName] = _createRouteFunction(this, routeName);
 
         return this;
     }
 
-    /**
-     *
-     * @param object routeOpts
-     * @param object resourceOpts
-     * @returns {Function}
-     */
-    function _createRouteFunction(routeOpts, resourceOpts) {
-        var opts = {},
-            routeUrl = '';
-
-        consoleProcess.log('createRouteFunction beg', opts);
-
-        if (checkType.has(resourceOpts, 'url') && resourceOpts.url.length) {
-            routeUrl += resourceOpts.url;
-        }
-        if (checkType.has(routeOpts, 'url') && routeOpts.url.length) {
-            routeUrl += routeOpts.url;
-        }
-
-        _.extend(opts, resourceOpts, routeOpts);
-        _.extend(opts.params, resourceOpts.params, routeOpts.params);
-
-        opts.url = _prepareUrl(routeUrl, opts);
-
-        _checkExisting(requiredOptsFields, opts);
-
-        return function(params) {
-            var ajaxParams = {},
-                ajaxData = opts
+    function _createRouteFunction(resource, routeName) {
+        return function(data, opts) {
+            var routeInfo = resource._routes[routeName],
+                actualData = data ? _.extend({}, routeInfo.data, data) : _.clone(routeInfo.data),
+                actualOpts = opts ? _.extend({}, routeInfo.opts, opts) : _.clone(routeInfo.opts),
+                promise = null
             ;
 
-            $.extend(true, ajaxParams, opts.params, params);
-            ajaxData.data = ajaxParams;
+            actualOpts['url'] = _mergeUrls(routeInfo.opts, opts);
+            actualOpts['url'] = _handleUrl(actualOpts['url'], actualData, actualOpts);
 
-            ajaxData.url = _prepareUrl(ajaxData.url, {
-                'params': ajaxParams,
-                'urlReplace': opts.urlReplace
-            }, true);
+            promise = new Promise(function(resolve, reject) {
+                actualOpts['data'] = actualData;
 
-            ajaxPromise = _returnAjaxPromise(ajaxData);
+                $.ajax(actualOpts)
+                    .done(function(response, textStatus, xhr) {
+                        if (typeof actualOpts['done'] === 'function') {
+                            resolve(actualOpts['done'](response, textStatus, xhr));
 
-            return ajaxPromise;
+                            return;
+                        }
+
+                        resolve(response);
+                    })
+                    .fail(function(xhr) {
+                        try {
+                            var responseText = $.parseJSON(xhr.responseText),
+                                code = response.code || '500',
+                                message = response.message || 'Error occurred';
+                        } catch (e) {
+                            var responseText = '',
+                                code = xhr.status,
+                                message = xhr.statusText;
+                        }
+
+                        var response = {
+                            responseText: responseText,
+                            code: code,
+                            message: message,
+                            request: actualOpts,
+                            route: routeName
+                        };
+
+                        if (typeof actualOpts['fail'] === 'function') {
+                            reject(actualOpts['fail'](response, xhr));
+
+                            return;
+                        }
+
+                        reject(response);
+                    })
+                ;
+            });
+
+            return promise;
         }
     }
 
-    function _returnAjaxPromise(ajaxData) {
-        var ajaxPromise = new Promise(function(ajaxResolve, apaxReject) {
-                $.ajax(ajaxData)
-                    .done(_defaultSuccessCallback)
-                    .done(function(responce) {ajaxResolve(responce)})
-                    .fail(_defaultErrorCallback)
-                    .fail(function(xhr) {apaxReject(xhr)});
-            })
-            .then(
-                function(result) {
-                    var newResult;
-
-                    if (ajaxData.hasOwnProperty('done') && (checkType.func(ajaxData.done))) {
-                        newResult = ajaxData.done(result);
-                        if (checkType.exists(newResult)) {
-                            return Promise.resolve(newResult);
-                        }
-                    }
-
-                    return Promise.resolve(result);
-                },
-                function(result) {
-                    var newResult;
-
-                    if (ajaxData.hasOwnProperty('fail') && (checkType.func(ajaxData.fail))) {
-                        newResult = ajaxData.fail(result);
-                        if (checkType.exists(newResult)) {
-                            return Promise.reject(newResult);
-                        }
-                    }
-
-                    return Promise.reject(result);
-                }
-            )
-            .then(
-                function(result) {
-                    var newResult;
-
-                    if (ajaxData.hasOwnProperty('then') && (checkType.func(ajaxData.then))) {
-                        newResult = ajaxData.then(result);
-                        if (checkType.exists(newResult)) {
-                            return Promise.resolve(newResult);
-                        }
-                    }
-
-                    return Promise.resolve(result);
-                },
-                function(result) {
-                    var newResult;
-
-                    if (ajaxData.hasOwnProperty('then') && (checkType.func(ajaxData.then))) {
-                        newResult = ajaxData.then(result);
-                        if (checkType.exists(newResult)) {
-                            return Promise.reject(newResult);
-                        }
-                    }
-
-                    return Promise.reject(result);
-                }
-            )
+    function _mergeUrls(leftUrlObject, rightUrlObject) {
+        var leftUrl = ((typeof leftUrlObject === 'object') && leftUrlObject.hasOwnProperty('url')) ? leftUrlObject['url'] : '',
+            rightUrl = ((typeof rightUrlObject === 'object') && rightUrlObject.hasOwnProperty('url')) ? rightUrlObject['url'] : ''
         ;
 
-        return ajaxPromise;
+        return leftUrl + rightUrl;
     }
 
-    function _defaultSuccessCallback(responce, textStatus, xhr) {
-        consoleAjax.info('ajax', xhr.status, xhr.statusText, this.url, responce, xhr);
-    }
+    function _handleUrl(url, data, opts) {
+        var textTransformer = $text(),
+            handler = $textReplaceHandler(
+                data,
+                {
+                    startSymbol: opts.urlReplace.start,
+                    endSymbol: opts.urlReplace.stop,
+                    removeMatch: true
+                }
+            ),
+            handledUrl = textTransformer.handler(handler).setText(url).getText();
+        ;
 
-    function _defaultErrorCallback(xhr) {
-        try {
-            var response = $.parseJSON(xhr.responseText),
-                code   = response.code || '500',
-                message  = response.message || 'Error occurred';
-        } catch (e) {
-            var code  = xhr.status,
-                message = xhr.statusText;
+
+        if ((handledUrl.indexOf(opts.urlReplace.start) != -1) || (handledUrl.indexOf(opts.urlReplace.stop) != -1)) {
+            console.error('Can\'t replace all placeholders in "' + handledUrl + '" url')
         }
 
-        consoleAjax.error('ajax', code, message, this.url, xhr);
-        consoleError.error('ajax error:', code, message);
+        return handledUrl;
     }
 
     return Resource;

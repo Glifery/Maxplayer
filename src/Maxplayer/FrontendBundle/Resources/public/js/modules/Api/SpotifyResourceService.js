@@ -10,16 +10,15 @@ define([
     var spotify = new Resource({
         url: 'https://api.spotify.com/v1/',
         method: 'GET',
-        done: _catchError
+        fail: _catchError
     });
 
     spotify
         .addRoute('search', {
-            url: 'search/',
-            params: {
-                type: 'album,artist,track',
-                limit: 10
-            }
+            url: 'search/'
+        }, {
+            type: 'album,artist,track',
+            limit: 10
         })
         .addRoute('artistGetInfo', {
             url: 'artists/{id}'
@@ -32,23 +31,21 @@ define([
         })
         .addRoute('artistGetAlbums', {
             url: 'artists/{id}/albums',
-            params: {
-                album_type: 'album',
-                market: 'ES',
-                limit: 50
-            },
             done: function(response) {
                 return response.items;
             }
+        },{
+            album_type: 'album',
+            market: 'ES',
+            limit: 50
         })
         .addRoute('artistGetTopTracks', {
             url: 'artists/{id}/top-tracks',
-            params: {
-                country: 'ES'
-            },
             done: function(response) {
                 return response.tracks;
             }
+        }, {
+            country: 'ES'
         })
         //.addRoute('albumSearch', {
         //    params: {
@@ -105,9 +102,8 @@ define([
     ;
 
     function _catchError(responce) {
-        if (responce.hasOwnProperty('error')) {
-            throw new Error('Spotify API error (' + responce['error'] + '): ' + responce['message']);
-        }
+        console.log('route', responce);
+        throw new Error('Spotify API error (' + responce['code'] + '): ' + responce['message']);
     }
 
     return spotify;

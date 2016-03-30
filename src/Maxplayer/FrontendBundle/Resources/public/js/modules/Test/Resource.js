@@ -13,27 +13,22 @@ define([
     var resource = new Resource({
         url: 'http://ws.audioscrobbler.com/2.0/',
         method: 'GET',
-        params: {
-            api_key: lastfmConnect.apiKey,
-            format: 'json'
-        },
         done: function(res) {console.log('--DONE with', res); /*throw new Error('112233');*/ return 123;},
         fail: function(res) {console.log('--FAIL with', res); /*throw new Error('112233');*/ return 123;},
         then: function(res) {console.log('--THEN with', res); /*throw new Error('112233');*/ return 123;}
+    }, {
+        api_key: lastfmConnect.apiKey,
+        format: 'json'
     });
 
     resource
-        .addRoute('artistSearch', {
-            params: {
-                method: 'artist.search'
-            }
+        .addRoute('artistSearch', {}, {
+            method: 'artist.search'
         })
-        .addRoute('artistGetSimilar', {
-            params: {
-                method: 'artist.getSimilar',
-                autocorrect: 1,
-                limit: 10
-            }
+        .addRoute('artistGetSimilar', {}, {
+            method: 'artist.getSimilar',
+            autocorrect: 1,
+            limit: 10
         })
     ;
 
