@@ -54,7 +54,7 @@ define([
 
         return this._promise_getArtist
     };
-    Artist.prototype.getTracks = function() {
+    Album.prototype.getTracks = function() {
         if (!this._promise_getTracks) {
             this._promise_getTracks = TrackPoolService.albumGetTracks(this);
         }

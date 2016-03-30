@@ -57,7 +57,18 @@ define([
 
             artist.getTopTracks().then(function(collection) {
                 var track = collection.at(Math.floor(Math.random() * collection.length)).get('domain');
-                console.log('collection', track.get('name'));
+
+                PlayerKitService.playset.add(track);
+            });
+        });
+
+        $(document).on('click', '.js-playset-add-album', function() {
+            var id = $(this).attr('data-id'),
+                album = ArtistPoolService.getById(id, 'album')
+            ;
+
+            album.getTracks().then(function(collection) {
+                var track = collection.at(Math.floor(Math.random() * collection.length)).get('domain');
 
                 PlayerKitService.playset.add(track);
             });
