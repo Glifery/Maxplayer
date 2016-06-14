@@ -5,6 +5,7 @@ define([
     'Pool/AlbumPoolService',
     'Pool/TrackPoolService',
     'Pool/TagPoolService',
+    'Pool/SoundPoolService',
     'Domain/Artist',
     'Domain/Album',
     'Domain/Track'
@@ -15,6 +16,7 @@ define([
     AlbumPoolService,
     TrackPoolService,
     TagPoolService,
+    SoundPoolService,
     Artist,
     Album,
     Track
@@ -36,7 +38,7 @@ define([
     Artist.prototype.getTopTracks = function() {
         if (!this._promise_getTopTracks) {
             this._promise_getTopTracks = TrackPoolService.artistGetTopTracks(this);
-        } else {console.log('from cache!');}
+        }
 
         return this._promise_getTopTracks;
     };
@@ -45,10 +47,8 @@ define([
         if (!this._promise_getArtist) {
             if (this._relation_artist) {
                 this._promise_getArtist = Promise.resolve(this._relation_artist);
-                console.log('resolve!!!');
             } else {
                 this._promise_getArtist = AlbumPoolService.albumGetArtist(this);
-                console.log('FIX!!!');
             }
         }
 
@@ -73,10 +73,8 @@ define([
         if (!this._promise_getArtist) {
             if (this._relation_artist) {
                 this._promise_getArtist = Promise.resolve(this._relation_artist);
-                console.log('resolve!!!');
             } else {
                 this._promise_getArtist = ArtistPoolService.trackGetArtist(this);
-                console.log('FIX!!!');
             }
         }
 
@@ -88,10 +86,16 @@ define([
                 this._promise_getAlbum = Promise.resolve(this._relation_album);
             } else {
                 this._promise_getArtist = AlbumPoolService.trackGetAlbum(this);
-                console.log('FIX!!!');
             }
         }
 
         return this._promise_getAlbum
+    };
+    Track.prototype.getSound = function() {
+        if (!this._promise_getSound) {
+            this._promise_getSound = SoundPoolService.getSound(this);
+        }
+
+        return this._promise_getSound
     };
 });

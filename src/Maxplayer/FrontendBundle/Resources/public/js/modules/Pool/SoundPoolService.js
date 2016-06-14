@@ -11,11 +11,11 @@ define([
 ) {
     var SoundPoolServiceClass = SoundPoolService;
 
-    SoundPoolServiceClass.prototype.fillSound = _fillSound;
+    SoundPoolServiceClass.prototype.getSound = _getSound;
 
     function SoundPoolService() {}
 
-    function _fillSound(track) {
+    function _getSound(track) {
         var _this = this,
             request = {
                 data: {
@@ -33,9 +33,11 @@ define([
         }
 
         return new Promise(function(resolve, reject) {
+            console.log('......SoundPoolService.trackSound');
             VkResourceService
                 .trackSound(request)
                 .then(function(response) {
+                    console.log('......SoundPoolService.set sound');
                         sound = new Sound(response);
                         track.set('sound', sound);
 

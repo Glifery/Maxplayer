@@ -45,6 +45,10 @@ define([
 
     function _break() {
         this._breaked = true;
+
+        //if (this._parent) {
+        //    this._parent.break();
+        //}
     }
 
     function _recursiveCheckBreaked(flowPromise) {

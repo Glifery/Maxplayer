@@ -1,13 +1,9 @@
 define([
-    'Utils/CheckType',
-    'Utils/Debug',
     'backbone',
-    'Pool/SoundPoolService'
+    'Utils/PromiseChain'
 ], function(
-    checkType,
-    debug,
     Backbone,
-    SoundPoolService
+    PromiseChain
     ){
     var Player = Backbone.Model.extend({
         defaults: {
@@ -17,22 +13,38 @@ define([
             volume: 50
         },
 
-        initialize: function() {
-            this.chainOn('playlist', 'change:current', function(playlist, track) {
-                this.play(track);
-            }, this)
-        },
-
         play: function(track) {
             var _this = this;
 
             this.get('soundStream').stopCurrent();
             this.set('currentTrack', track);
 
-            return SoundPoolService
-                .fillSound(track)
+            return new PromiseChain('Player.play')
+                .then(function() {
+                    console.log('....Player.fillSound');
+                    return track.getSound();
+                })
                 .then(function(sound) {
-                    _this.get('soundStream').playInStream(sound);
+                    console.log('....Player.playInStream');
+                    return _this.get('soundStream').playInStream(sound);
+                })
+            ;
+        },
+
+        playNext: function() {
+            var _this = this;
+
+            return new PromiseChain('Playlist.playNext')
+                .then(function() {
+                    console.log('..Player.gotoNextTrack');
+                    return _this.get('playlist').gotoNextTrack();
+                })
+                .then(function(track) {
+                    console.log('..Player.play');
+                    return _this.play(track);
+                })
+                .then(function(track) {
+                    return _this.get('playlist').loadNextTrack();
                 })
             ;
         },

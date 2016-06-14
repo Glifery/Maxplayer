@@ -1,14 +1,12 @@
 define([
-    'Utils/CheckType',
-    'Utils/Debug',
     'underscore',
     'backbone',
+    'Utils/PromiseChain',
     'Domain/Collection'
 ], function(
-    checkType,
-    debug,
     _,
     Backbone,
+    PromiseChain,
     Collection
 ){
     var Playlist = Backbone.Model.extend({
@@ -26,32 +24,52 @@ define([
             this.get('nextCollection').on('add', propagateEventFor(this, 'add:nextCollection', true));
             this.get('nextCollection').on('remove', propagateEventFor(this, 'remove:nextCollection', true));
             this.get('nextCollection').on('update', propagateEventFor(this, 'update:nextCollection'));
+
+            this.chainOn('playset', 'reset', function() {
+                console.log('RESET!!');
+                this.get('nextCollection').reset();
+            }, this)
         },
 
         loadNextTrack: function() {
+            var _this = this;
+
             if (!this.get('playset')) {
                 throw new Error('Playset is not set in current Playlist');
             }
 
-            return this.get('playset')
-                .getNextTrack()
+            return new PromiseChain()
+                .then(function() {
+                    console.log('......Playlist.getNextTrack');
+                    return _this.get('playset').getNextTrack();
+                })
                 .then(pushToNextCollection(this))
             ;
         },
 
         gotoNextTrack: function() {
-            var track = pullTrackFromNextCollection(this);
+            var _this = this;
 
-            if (!track) {
-                return this.loadNextTrack().then(_.bind(this.gotoNextTrack, this));
-            }
+            return new PromiseChain()
+                .then(function() {
+                    if (!_this.get('nextCollection').length) {
+                        return _this.loadNextTrack();
+                    }
+                })
+                .then(function() {
+                    var track = pullTrackFromNextCollection(_this);
+                    makeTrackCurrent(_this, track);
 
-            this.set('current', track);
-            this.get('prevCollection').addDomain(track);
-
-            return Promise.resolve(track);
+                    return Promise.resolve(track);
+                })
+            ;
         }
     });
+
+    function makeTrackCurrent(playlist, track) {
+        playlist.set('current', track);
+        playlist.get('prevCollection').addDomain(track);
+    }
 
     function propagateEventFor(playlist, collectionName, isDomain) {
         return function(domainOrCollection, collectionOrEvent) {
@@ -82,7 +100,10 @@ define([
 
     function pushToNextCollection(playlist) {
         return function(track) {
+            console.log('......Playlist.pushToNextCollection');
             playlist.get('nextCollection').addDomain(track);
+
+            return track;
         }
     }
 

@@ -28,7 +28,7 @@ define([
         stopCurrent: function() {
             var currentSound = this.get('currentSound');
 
-            if (!currentSound) {
+            if ((!currentSound) || (!currentSound.get('stream'))) {
                 return;
             }
 
@@ -48,6 +48,12 @@ define([
 
         playInStream: function(sound) {
             this.stopCurrent(this);
+
+            if (!sound.get('url')) {
+                console.log('ERROR: no sound URL found');
+
+                return;
+            }
 
             var stream = SoundmanagerService.createSound({
                 url: sound.get('url'),

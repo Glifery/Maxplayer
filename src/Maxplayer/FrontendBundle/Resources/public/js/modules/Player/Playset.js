@@ -1,12 +1,12 @@
 define([
     'Utils/CheckType',
-    'Utils/Debug',
     'backbone',
+    'Utils/PromiseChain',
     'Domain/Collection'
 ], function(
     checkType,
-    debug,
     Backbone,
+    PromiseChain,
     Collection
 ){
     var Playset = Backbone.Model.extend({
@@ -36,6 +36,7 @@ define([
 
         reset: function() {
             this._collection.reset();
+            this.trigger('reset');
 
             return this;
         },
@@ -49,15 +50,27 @@ define([
             }
 
             switch (domain['domain']) {
-                case 'artist': return domain.getTopTracks().then(returnOneFromCollection);
-                case 'album': return domain.getTracks().then(returnOneFromCollection);
-                case 'track': return Promise.resolve(domain);
-                default: Promise.reject();
+                case 'artist':
+                    return new PromiseChain()
+                        .then(function() {
+                            console.log('........Playset.getTopTracks');
+                            return domain.getTopTracks();
+                        })
+                        .then(returnOneFromCollection)
+                    ;
+                case 'album':
+                    return domain.getTracks().then(returnOneFromCollection);
+                case 'track':
+                    return Promise.resolve(domain);
+                default:
+                    return Promise.reject();
             }
         }
     });
 
     function returnOneFromCollection(collection) {
+        console.log('........Playset.returnOneFromCollection');
+
         if (!collection.length) {
             return Promise.reject();
         }

@@ -7,6 +7,7 @@ define([
     'Guess/Guesser',
     'Player/PlayerKitService',
     'Pool/ArtistPoolService',
+    'Utils/PromiseChain',
     'text!template/demo/DemoPlayer.html'
 ], function (
     $,
@@ -15,6 +16,7 @@ define([
     Guesser,
     PlayerKitService,
     ArtistPoolService,
+    PromiseChain,
     template
 ) {
     console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
@@ -46,7 +48,7 @@ define([
             guesser.get('track').each(function(element) {
                 var domain = element.get('domain');
 
-                $('.js-guesser-track').append('<li><a class="js-playset-add-track" href="javascript:void(0);" data-id="' + domain.get('id') + '">' + domain.get('name') + ' (' + domain.get('artist') + ' "' + domain.get('album') + '")</a></li>');
+                $('.js-guesser-track').append('<li><a class="js-playset-add-track" href="javascript:void(0);" data-id="' + domain.get('id') + '">' + domain.get('name') + ' (' + domain.get('artist') + ')</a></li>');
             });
         });
 
@@ -55,8 +57,17 @@ define([
                 artist = ArtistPoolService.getById(id, 'artist')
             ;
 
-            PlayerKitService.playset.set(artist);
-            PlayerKitService.playlist.gotoNextTrack();
+            console.log('-----------------------------');
+            new PromiseChain('PlayerKit.play')
+                .then(function() {
+                    PlayerKitService.playset.set(artist);
+
+                    //return new Promise(function(resolve) {setTimeout(function() {resolve(true)}, 3000)});
+                })
+                .then(function() {
+                    PlayerKitService.player.playNext();
+                })
+            ;
         });
 
         $(document).on('click', '.js-playset-add-album', function() {
@@ -65,7 +76,7 @@ define([
             ;
 
             PlayerKitService.playset.set(album);
-            PlayerKitService.playlist.gotoNextTrack();
+            PlayerKitService.player.playNext();
         });
 
         $(document).on('click', '.js-playset-add-track', function() {
@@ -74,8 +85,12 @@ define([
             ;
 
             PlayerKitService.playset.set(track);
-            PlayerKitService.playlist.gotoNextTrack();
+            PlayerKitService.player.playNext();
         });
+
+        $(document).on('click', '.js-button-next', function() {
+            PlayerKitService.player.playNext();
+        })
 
         PlayerKitService.playset.getCollection().on('update', function() {
             $('.js-playset').html('');
@@ -86,8 +101,6 @@ define([
                 $('.js-playset').append('<li><a class="js-playlist-add" href="javascript:void(0);" data-id="' + track.get('id') + '">' + track.get('name') + ' (' + track.get('artist') + ' "' + track.get('album') + '")</a></li>');
             });
         });
-
-
 
         PlayerKitService.playlist.on('update:prevCollection change:current update:nextCollection', function(collection, track) {
             $('.js-playlist').html('');
@@ -115,15 +128,5 @@ define([
             //console.log('change!!', sound);
             $('.js-player').html(sound.get('title') + ': (' + sound.get('loadPosition') + ') ' + sound.get('playPosition') + ' sec');
         });
-
-        $('.js-button-next').on('click', function() {
-            PlayerKitService.playlist.gotoNextTrack()
-                .then(function(next) {
-                    console.log('..gotoNextTrack:', next.get('name'), '   prev/next:', PlayerKitService.playlist.get('prevCollection').size(), PlayerKitService.playlist.get('nextCollection').size())
-
-                    return PlayerKitService.playlist.loadNextTrack();
-                })
-            ;
-        })
     });
 });
